@@ -1,6 +1,0 @@
-build/
-builddir/
-.flatpak-builder/
-
-# temp files created by elementary OS code
-*~
