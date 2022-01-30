@@ -1,0 +1,12 @@
+[Flatpak Ref]
+Name=com.github.{GITHUB.ORG}.{GITHUB.APP}
+Url=https://{GITHUB.ORG.ORIGINAL}.github.io/{GITHUB.APP.ORIGINAL}/repo
+Branch=stable
+Title={APP.NAME}
+Comment={APP.COMMENT}
+Description={APP.DESCRIPTION}
+Icon=https://raw.githubusercontent.com/{GITHUB.ORG.ORIGINAL}/{GITHUB.APP.ORIGINAL}/main/data/128.svg
+Homepage=https://{GITHUB.ORG.ORIGINAL}.github.io/{GITHUB.APP.ORIGINAL}
+IsRuntime=false
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
+GPGKey={GPGKey}

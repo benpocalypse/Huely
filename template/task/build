@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+# The ninja build file may be missing if the
+# person ran a flatpak build before running this script.
+# If so, reconfigure meson.
+if [[ ! -f build/build.ninja ]]; then
+  meson build --prefix=/usr
+fi
+
+pushd build
+ninja
+popd
+
+echo '{APP.NAME} is built.'
+echo ''
+echo 'Run it with:'
+echo 'build/com.github.{GITHUB.ORG}.{GITHUB.APP}'
