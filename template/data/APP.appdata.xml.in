@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright ⓒ {COPYRIGHT.YEAR} to present, {COPYRIGHT.NAME} <{COPYRIGHT.EMAIL}> -->
+<!-- Copyright ⓒ 2022 to present, Ben Foote <ben.foote@gmail.com> -->
 <component type="desktop">
-  <id>com.github.{GITHUB.ORG}.{GITHUB.APP}</id>
+  <id>com.github.benpocalypse.Huely</id>
   <metadata_license>CC0</metadata_license>
   <!--
     To update the content rating data of your app, you can
@@ -9,20 +9,20 @@
     https://hughsie.github.io/oars/generate.html
   -->
   <content_rating type="oars-1.1" />
-  <name>{APP.NAME}</name>
-  <summary>{APP.COMMENT}</summary>
+  <name>Huely</name>
+  <summary>Color your workspace</summary>
   <description>
-    <p>{APP.DESCRIPTION}</p>
+    <p>Control WiFi lights using this simple app.</p>
   </description>
-  <developer_name>{COPYRIGHT.NAME}</developer_name>
-  <launchable type="desktop-id">com.github.{GITHUB.ORG}.{GITHUB.APP}.desktop</launchable>
+  <developer_name>Ben Foote</developer_name>
+  <launchable type="desktop-id">com.github.benpocalypse.Huely.desktop</launchable>
 
   <!--
     Do not uncomment or change the icon line, below. Its state is automatically
     managed by the task/preview-in-appcenter script as necessary. If you uncomment it
     manually, your Flatpak package attempts will fail.
   -->
-  <!-- <icon type="stock">com.github.{GITHUB.ORG}.{GITHUB.APP}</icon> -->
+  <!-- <icon type="stock">com.github.benpocalypse.Huely</icon> -->
 
   <custom>
     <!--
@@ -57,9 +57,9 @@
   </custom>
 
   <!-- Links. -->
-  <url type="homepage">https://github.com/{GITHUB.ORG.ORIGINAL}/{GITHUB.APP.ORIGINAL}</url>
-  <url type="bugtracker">https://github.com/{GITHUB.ORG.ORIGINAL}/{GITHUB.APP.ORIGINAL}/issues</url>
-  <url type="help">https://github.com/{GITHUB.ORG.ORIGINAL}/{GITHUB.APP.ORIGINAL}#readme</url>
+  <url type="homepage">https://github.com/benpocalypse/Huely</url>
+  <url type="bugtracker">https://github.com/benpocalypse/Huely/issues</url>
+  <url type="help">https://github.com/benpocalypse/Huely#readme</url>
 
   <!--
     If you accept donations, you can uncomment the line below and add a URL
@@ -67,7 +67,7 @@
   -->
   <!-- <url type="donation"></url> -->
 
-  <update_contact>{COPYRIGHT.EMAIL}</update_contact>
+  <update_contact>ben.foote@gmail.com</update_contact>
 
   <!--
     Screenshots
@@ -101,7 +101,7 @@
   -->
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/{GITHUB.ORG.ORIGINAL}/{GITHUB.APP.ORIGINAL}/main/screenshots/en/light-and-dark.png</image>
+      <image>https://raw.githubusercontent.com/benpocalypse/Huely/main/screenshots/en/light-and-dark.png</image>
     </screenshot>
   </screenshots>
 </component>

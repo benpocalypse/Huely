@@ -13,7 +13,7 @@ pushd build
 ninja
 popd
 
-echo '{APP.NAME} is built.'
+echo 'Huely is built.'
 echo ''
 echo 'Run it with:'
-echo 'build/com.github.{GITHUB.ORG}.{GITHUB.APP}'
+echo 'build/com.github.benpocalypse.Huely'

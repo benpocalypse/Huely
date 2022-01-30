@@ -1,8 +1,8 @@
-# {APP.NAME} web site source
+# Huely web site source
 
-[![{APP.NAME} logo](128.svg)](https://{GITHUB.ORG.ORIGINAL}.github.io/{GITHUB.APP.ORIGINAL})
+[![Huely logo](128.svg)](https://benpocalypse.github.io/Huely)
 
-## [Visit the site.](https://{GITHUB.ORG.ORIGINAL}.github.io/{GITHUB.APP.ORIGINAL)
+## [Visit the site.](https://benpocalypse.github.io/{GITHUB.APP.ORIGINAL)
 
 ## Features:
 

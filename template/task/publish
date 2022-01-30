@@ -6,7 +6,7 @@
 
 echo -e "\nPublishing.\n"
 
-gpg_home_directory="${HOME}/.small-tech.org/watson/com.github.{GITHUB.ORG}.{GITHUB.APP}/gpg"
+gpg_home_directory="${HOME}/.small-tech.org/watson/com.github.benpocalypse.Huely/gpg"
 
 function gpg_key_id {
     echo "$(gpg2 --homedir=${gpg_home_directory} --list-keys --with-colons | grep 'fpr.*' | sed 's/fpr//g' | sed 's/://g')"
@@ -24,7 +24,7 @@ if [[ ! -d "${gpg_home_directory}/private-keys-v1.d" ]]; then
     chmod 700 "${gpg_home_directory}"
 
     # Create GPG key.
-    gpg2 --batch --homedir="${gpg_home_directory}" --passphrase '' --quick-gen-key {COPYRIGHT.EMAIL} - - never
+    gpg2 --batch --homedir="${gpg_home_directory}" --passphrase '' --quick-gen-key ben.foote@gmail.com - - never
 
     # Get the public key, in base64, with newlines stripped
     # to include in our .flatpakref file.

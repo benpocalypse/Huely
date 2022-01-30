@@ -123,9 +123,9 @@ for language in ${languages[*]}; do
 
     echo -e "          » Launching app."
 
-    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.{GITHUB.ORG}.{GITHUB.APP} &
+    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.benpocalypse.Huely &
     sleep 1
-    xdotool search --onlyvisible --class {GITHUB.APP} windowactivate
+    xdotool search --onlyvisible --class Huely windowactivate
 
     echo -e "          » Taking screenshot."
 
@@ -147,9 +147,9 @@ for language in ${languages[*]}; do
 
     echo -e "          » Launching app."
 
-    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.{GITHUB.ORG}.{GITHUB.APP} &
+    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.benpocalypse.Huely &
     sleep 1
-    xdotool search --onlyvisible --class {GITHUB.APP} windowactivate
+    xdotool search --onlyvisible --class Huely windowactivate
 
     echo -e "          » Taking screenshot."
 

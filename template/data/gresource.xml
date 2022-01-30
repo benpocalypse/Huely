@@ -4,7 +4,7 @@
     Put any custom resources in the data directory and declare
     them here. e.g.
 
-    <gresource prefix="/com/github/{GITHUB.ORG}/{GITHUB.APP}">
+    <gresource prefix="/com/github/benpocalypse/Huely">
       <file>custom-icon.png</file>
     </gresource>
   -->
