@@ -39,7 +39,7 @@ namespace Huely {
                 // is assigned before the constructors are run.
                 //
                 // So use the app property when referencing the application instance from
-                // the constructors. Anywhere else, they can be used interchangably.
+                // the constructors. Anywhere else, they can be used interchangeably.
                 app: application,
                 application: application,                    // DON’T use in constructors; won’t have been assigned yet.
                 height_request: 420,
@@ -89,6 +89,9 @@ namespace Huely {
             toolbar = new Huely.Widgets.HeaderBar ();
             var grid = new Gtk.Grid ();
             grid.attach (toolbar, 0, 0);
+
+            var label = new Gtk.Label("Hello world!");
+            grid.attach(label,0,1);
 
             // Add other components to go under the toolbar here.
 
