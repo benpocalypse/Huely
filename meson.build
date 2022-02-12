@@ -36,6 +36,7 @@ executable(
     'src' / 'Application.vala',
     'src' / 'MainWindow.vala',
     'src' / 'Widgets' / 'HeaderBar.vala',
+    'src' / 'Widgets' / 'LightListBoxRow.vala',
     'src' / 'Constants' / 'Colors.vala',
     config_header,
     dependencies: [
