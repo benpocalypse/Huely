@@ -35,8 +35,13 @@ executable(
     gresource,
     'src' / 'Application.vala',
     'src' / 'MainWindow.vala',
-    'src' / 'Widgets' / 'LightListBoxRow.vala',
     'src' / 'Constants' / 'Colors.vala',
+    'src' / 'Models' / 'Light.vala',
+    'src' / 'Utilities' / 'ObservableList.vala',
+    'src' / 'ViewModels' / 'LightViewModel.vala',
+    'src' / 'Views' / 'LightView.vala',
+    'src' / 'Widgets' / 'LightListBoxRow.vala',
+
     config_header,
     dependencies: [
       dependency('granite', version: '>=5.2.4'),
