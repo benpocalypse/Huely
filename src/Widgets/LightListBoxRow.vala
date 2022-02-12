@@ -3,13 +3,13 @@ namespace Huely.Widgets {
     {
         private Gtk.Box _verticalBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         private Gtk.Box _horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-        private Gtk.Label _lightName;
+        public Gtk.Label LightName;
         private Gtk.Label _ipAddress;
         private Gtk.ColorButton _lightColor = new Gtk.ColorButton ();
 
         public LightListBoxRow ()
         {
-            _lightName  = new Gtk.Label ("Light 1")
+            LightName  = new Gtk.Label ("Light 1")
             {
                 halign = Gtk.Align.START,
                 margin_left = 12,
@@ -32,7 +32,7 @@ namespace Huely.Widgets {
             font.set_style (Pango.Style.ITALIC);
             _ipAddress.override_font (font);
 
-            _verticalBox.add (_lightName);
+            _verticalBox.add (LightName);
             _verticalBox.add (_ipAddress);
 
             var rgba = new Gdk.RGBA();
@@ -57,7 +57,7 @@ namespace Huely.Widgets {
 
         public void set_name (string name)
         {
-            _lightName.set_label (name);
+            LightName.set_label (name);
         }
 
         public void set_ip_address (string ipAddress)

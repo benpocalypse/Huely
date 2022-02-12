@@ -110,11 +110,18 @@ namespace Huely {
             headrbar2.name = "content";
             headrbar2.visible = true;
             headrbar2.hexpand = true;
+            headrbar2.show_close_button = true;
+
+            Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
+            headrGroup.add_header_bar (headrbar1);
+            headrGroup.add_header_bar (headrbar2);
+            headrGroup.set_decorate_all (false);
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
             nameLabel.margin = 12;
             Gtk.Entry nameEntry = new Gtk.Entry ();
             nameEntry.margin = 5;
+            nameEntry.margin_top = 10;
             Gtk.Box nameBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             nameBox.add (nameLabel);
             nameBox.add (nameEntry);
@@ -137,12 +144,20 @@ namespace Huely {
             button1.clicked.connect (on_back_button_clicked);
 
             leaf2 = new Hdy.Leaflet ();
+            leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
+            leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
             leaf2.visible = true;
 
             lightListBox = new Gtk.ListBox ();
             var testButton = new Gtk.Button ();
             testButton.set_label ("Switch!");
             testButton.clicked.connect (on_switch_button_clicked);
+
+            lightListBox.row_selected.connect ((row) =>
+            {
+                nameEntry.text = ((Widgets.LightListBoxRow)row).LightName.label;
+            });
+
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 1").with_color ("#FF0000"));
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 2").with_color ("#00FF00"));
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 3").with_color ("#0000FF"));
@@ -185,8 +200,6 @@ namespace Huely {
         [GtkCallback]
         public void on_switch_button_clicked ()
         {
-            headrbar1.show_close_button = false;
-            headrbar2.show_close_button = true;
             leaf1.set_visible_child (headrbar2);
             leaf2.set_visible_child (contentBox);
         }
@@ -194,8 +207,6 @@ namespace Huely {
         [GtkCallback]
         public void on_back_button_clicked ()
         {
-            headrbar1.show_close_button = true;
-            headrbar2.show_close_button = false;
             leaf1.set_visible_child (headrbar1);
             leaf2.set_visible_child (lightListBox);
         }
