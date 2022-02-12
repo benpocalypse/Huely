@@ -3,8 +3,6 @@ namespace Huely {
         public weak Huely.Application app { get; construct; }
 
         // Widgets
-        public Huely.Widgets.HeaderBar headerbar;
-
         public const string ACTION_PREFIX = "win.";
         public const string ACTION_FULLSCREEN = "action_fullscreen";
         public const string ACTION_QUIT = "action_quit";
@@ -84,6 +82,10 @@ namespace Huely {
         // Layout.
         private Hdy.Leaflet leaf1;
         private Hdy.HeaderBar headrbar2;
+        private Hdy.HeaderBar headrbar1;
+        private Gtk.Box contentBox;
+        private Hdy.Leaflet leaf2;
+        private Gtk.ListBox lightListBox;
 
         private void create_layout () {
             // Unlike GTK, in Handy, the header bar is added to the window’s content area.
@@ -95,8 +97,8 @@ namespace Huely {
             leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf1.transition_type = Hdy.LeafletTransitionType.SLIDE;
 
-            Hdy.HeaderBar headrbar1 = new Hdy.HeaderBar ();
-            headrbar1.set_title ("Huely App");
+            headrbar1 = new Hdy.HeaderBar ();
+            headrbar1.set_title ("Huely");
             headrbar1.visible = true;
             headrbar1.show_close_button = true;
 
@@ -108,12 +110,6 @@ namespace Huely {
             headrbar2.name = "content";
             headrbar2.visible = true;
             headrbar2.hexpand = true;
-            //headrbar2.show_close_button = true;
-
-            Gtk.Revealer revealer = new Gtk.Revealer ();
-            revealer.reveal_child = true;
-            revealer.transition_type = Gtk.RevealerTransitionType.CROSSFADE;
-            revealer.visible = true;
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
             nameLabel.margin = 12;
@@ -125,74 +121,59 @@ namespace Huely {
 
             Gtk.ColorChooserWidget colorChooser = new Gtk.ColorChooserWidget ();
             colorChooser.margin = 12;
-            //colorChooser.color_activated.connect (on_color_chosen);
-            colorChooser.color_activated.connect (() =>
-            {
-                stdout.printf ("tada!");
-                headrbar2.set_title (colorChooser.get_rgba ().to_string ());
-                //button2.set_label (colorChooser.get_rgba ().to_string ());
-
-            });
 
             Gtk.Button setButton = new Gtk.Button ();
             setButton.margin = 5;
             setButton.halign = Gtk.Align.END;
             setButton.label = "Set";
 
-            Gtk.Box contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             contentBox.add (nameBox);
             contentBox.add (colorChooser);
             contentBox.add (setButton);
 
             Gtk.Button button1 = new Gtk.Button ();
             button1.set_label ("Back");
-            button1.clicked.connect (() =>
-            {
-                button1.set_label (colorChooser.get_rgba ().to_string ());
-            });
+            button1.clicked.connect (on_back_button_clicked);
 
-            Hdy.Leaflet leaf2 = new Hdy.Leaflet ();
+            leaf2 = new Hdy.Leaflet ();
             leaf2.visible = true;
 
-            Gtk.ListBox lightListBox = new Gtk.ListBox ();
+            lightListBox = new Gtk.ListBox ();
+            var testButton = new Gtk.Button ();
+            testButton.set_label ("Switch!");
+            testButton.clicked.connect (on_switch_button_clicked);
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 1").with_color ("#FF0000"));
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 2").with_color ("#00FF00"));
             lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 3").with_color ("#0000FF"));
-
-            Gtk.Separator separator2 = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+            lightListBox.add (testButton);
 
             Gtk.Label label = new Gtk.Label("Content");
             label.label = "Content";
 
             leaf1.add (headrbar1);
-            //leaf1.add (separator);
-            revealer.add (button1);
-            headrbar2.add (revealer);
+            leaf1.add (separator);
+
+            headrbar2.add (button1);
+
             leaf1.add (headrbar2);
 
             titlebar.add(leaf1);
 
-            //leaf2.add (button2);
             leaf2.add (lightListBox);
-            //leaf2.add (separator2);
-            //leaf2.add (label);
-            //leaf2.add (colorChooser);
             leaf2.add (contentBox);
 
-            // These sizegroups are what make the adaptive magic happen.
-            Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            sizegroup1.add_widget(headrbar1);
-            sizegroup1.add_widget(separator);
-            //sizegroup1.add_widget(button2);
-            sizegroup1.add_widget(lightListBox);
+            leaf1.set_visible_child (headrbar2);
+            leaf2.set_visible_child (contentBox);
 
-            Gtk.SizeGroup sizegroup2 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            sizegroup2.add_widget(separator);
-            sizegroup2.add_widget(separator2);
+            // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
+            Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
+            sizegroup1.add_widget (headrbar1);
+            sizegroup1.add_widget (lightListBox);
 
             Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            sizegroup3.add_widget(headrbar2);
-            sizegroup3.add_widget(label);
+            sizegroup3.add_widget (headrbar2);
+            sizegroup3.add_widget (contentBox);
 
             Gtk.Grid grid = new Gtk.Grid();
             grid.attach (titlebar, 0, 0);
@@ -202,15 +183,21 @@ namespace Huely {
         }
 
         [GtkCallback]
-        public void on_color_chosen (Gdk.RGBA color)
+        public void on_switch_button_clicked ()
         {
-            stdout.printf ("tada!");
+            headrbar1.show_close_button = false;
+            headrbar2.show_close_button = true;
+            leaf1.set_visible_child (headrbar2);
+            leaf2.set_visible_child (contentBox);
         }
 
         [GtkCallback]
-        public void on_show_content_clicked ()
+        public void on_back_button_clicked ()
         {
-            leaf1.set_visible_child (headrbar2);
+            headrbar1.show_close_button = true;
+            headrbar2.show_close_button = false;
+            leaf1.set_visible_child (headrbar1);
+            leaf2.set_visible_child (lightListBox);
         }
 
         // State preservation.
