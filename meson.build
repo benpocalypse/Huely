@@ -37,6 +37,7 @@ executable(
     'src' / 'MainWindow.vala',
     'src' / 'Constants' / 'Colors.vala',
     'src' / 'Models' / 'Light.vala',
+    'src' / 'Utilities' / 'LightDiscovery.vala',
     'src' / 'Utilities' / 'ObservableList.vala',
     'src' / 'ViewModels' / 'LightViewModel.vala',
     'src' / 'Views' / 'LightView.vala',
