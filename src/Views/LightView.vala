@@ -29,5 +29,10 @@ public class Huely.LightView : Gtk.ListBox
     {
         //set_css_name ("studentview");
     }
+
+    public void add_light (string name)
+    {
+        _view_model.lights.add (new Light () { name = name, color = "#FF0000", isOn = true });
+    }
 }
 

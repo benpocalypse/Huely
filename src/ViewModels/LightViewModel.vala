@@ -1,14 +1,16 @@
 public class Huely.LightViewModel : Object
 {
-    public ObservableList<Huely.Light> lights
+    public Huely.ObservableList<Huely.Light> lights
     {
         get;
-        default = new ObservableList<Huely.Light> (
-        {
-            new Huely.Light () { name = "Light 1", color = "#FF0000", isOn = true },
-            new Huely.Light () { name = "Light 2", color = "#00FF00", isOn = false },
-            new Huely.Light () { name = "Light 3", color = "#0000FF", isOn = true }
-        });
+        default = new Huely.ObservableList<Huely.Light> ();
+    }
+
+    construct
+    {
+        lights.add (new Huely.Light () { name = "Light 1", color = "#FF0000", isOn = true });
+            //new Huely.Light () { name = "Light 2", color = "#00FF00", isOn = false },
+            //new Huely.Light () { name = "Light 3", color = "#0000FF", isOn = true }
     }
 
     // FIXME - Remove this.

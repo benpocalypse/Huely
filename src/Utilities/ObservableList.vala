@@ -1,85 +1,49 @@
-public class Huely.ObservableList<T> : Gee.ArrayList<T>, ListModel
-{
-    public ObservableList (T[]? array = null)
-    {
-        if (array != null)
-            base.wrap (array);
-    }
+public class Huely.ObservableList<T> : Object, ListModel {
+  List<T> data = new List<T> ();
 
-    protected override bool add (T item)
-    {
-        bool added = base.add (item);
+  public void add (T item) {
+    var position = data.length ();
 
-        if (added)
-            this.items_changed (this.index_of (item), 0, 1);
+    data.append (item);
 
-        return added;
-    }
+    items_changed (position, 0, 1);
+  }
 
-    public new bool add_all (Gee.Collection<T> collection)
-    {
-        int index = this.size;
-        bool added = base.add_all (collection);
+  public void add_all (List<T> items) {
+    var position = data.length ();
 
-        if (added)
-            this.items_changed (index, 0, collection.size);
+    foreach (var item in items)
+      data.append (item);
 
-        return added;
-    }
+    items_changed (position, 0, items.length ());
+  }
 
-    protected override void clear ()
-    {
-        base.clear ();
-        this.items_changed (0, this.size, 0);
-    }
+  public new T @get (uint index) {
+    return data.nth_data (index);
+  }
 
-    protected Object? get_item (uint position)
-    {
-        if (position >= this.size)
-            return null;
+  public bool remove (T item) {
+    var position = data.index (item);
 
-        return this[(int) position] as Object;
-    }
+    if (position == -1)
+      return false;
 
-    protected Type get_item_type ()
-    {
-        return typeof (T);
-    }
+    data.remove (item);
+    items_changed (position, 1, 0);
 
-    protected uint get_n_items ()
-    {
-        return this.size;
-    }
+    return true;
+  }
 
-    protected override void insert (int index, T item)
-    {
-        base.insert (index, item);
-        this.items_changed (index, 0, 1);
-    }
+  Object? get_item (uint position) {
+    return this[position] as Object;
+  }
 
-    protected override bool remove (T item)
-    {
-        int index = this.index_of (item);
-        bool removed = base.remove (item);
+  Type get_item_type () {
+    return typeof (T);
+  }
 
-        if (removed)
-            this.items_changed (index, 1, 0);
-
-        return removed;
-    }
-
-    protected override T remove_at (int index)
-    {
-        T item = base.remove_at (index);
-        this.items_changed (index, 1, 0);
-
-        return item;
-    }
-
-    protected override void @set (int index, T item)
-    {
-        base[index] = item;
-        this.items_changed (index, 1, 1);
-    }
+  uint get_n_items () {
+    return data.length ();
+  }
 }
 

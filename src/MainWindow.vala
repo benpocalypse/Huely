@@ -85,7 +85,7 @@ namespace Huely {
         private Hdy.HeaderBar headrbar1;
         private Gtk.Box contentBox;
         private Hdy.Leaflet leaf2;
-        private LightView lightView;
+        private Gtk.ScrolledWindow scrolledWindow;
 
         private void create_layout () {
             // Unlike GTK, in Handy, the header bar is added to the window’s content area.
@@ -148,23 +148,6 @@ namespace Huely {
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
             leaf2.visible = true;
 
-            /*
-            lightListBox = new Gtk.ListBox ();
-            var testButton = new Gtk.Button ();
-            testButton.set_label ("Switch!");
-            testButton.clicked.connect (on_switch_button_clicked);
-
-            lightListBox.row_selected.connect ((row) =>
-            {
-                nameEntry.text = ((Widgets.LightListBoxRow)row).LightName.label;
-            });
-
-            lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 1").with_color ("#FF0000"));
-            lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 2").with_color ("#00FF00"));
-            lightListBox.add (new Widgets.LightListBoxRow ().with_name ("Light 3").with_color ("#0000FF"));
-            lightListBox.add (testButton);
-            */
-
             Gtk.Label label = new Gtk.Label("Content");
             label.label = "Content";
 
@@ -177,13 +160,27 @@ namespace Huely {
 
             titlebar.add(leaf1);
 
-            lightView = new LightView ();
+            LightView lightView = new LightView ();
             lightView.row_selected.connect ((row) =>
             {
                 nameEntry.text = ((LightListBoxRow)row).LightName.label;
             });
 
-            leaf2.add (lightView);
+            int i = 4;
+            var btn = new Gtk.Button();
+            btn.set_label ("Add light!");
+            btn.clicked.connect (() =>
+            {
+                lightView.add_light (@"Light $i");
+                lightView.show_all ();
+                i++;
+            });
+
+            headrbar1.add (btn);
+
+            scrolledWindow = new Gtk.ScrolledWindow (null, null);
+            scrolledWindow.add (lightView);
+            leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
 
             leaf1.set_visible_child (headrbar2);
@@ -192,7 +189,7 @@ namespace Huely {
             // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
             Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             sizegroup1.add_widget (headrbar1);
-            sizegroup1.add_widget (lightView);
+            sizegroup1.add_widget (scrolledWindow);
 
             Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             sizegroup3.add_widget (headrbar2);
@@ -203,6 +200,9 @@ namespace Huely {
             grid.attach (leaf2, 0, 1);
 
             add (grid);
+
+            LightDiscovery dl = new LightDiscovery ();
+            dl.DiscoverLights ();
         }
 
         [GtkCallback]
@@ -216,7 +216,7 @@ namespace Huely {
         public void on_back_button_clicked ()
         {
             leaf1.set_visible_child (headrbar1);
-            leaf2.set_visible_child (lightView);
+            leaf2.set_visible_child (scrolledWindow);
         }
 
         // State preservation.
