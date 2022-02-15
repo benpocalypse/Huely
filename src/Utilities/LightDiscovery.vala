@@ -1,56 +1,40 @@
 public class Huely.LightDiscovery : GLib.Object
 {
-    public List<Huely.Light> DiscoverLights ()
+    public ObservableList<Huely.Light> DiscoverLights ()
     {
-        List<Huely.Light> discoveredLights = new List<Huely.Light> ();
+        ObservableList<Huely.Light> discoveredLights = new ObservableList<Huely.Light> ();
 
         GLib.Socket sock;
-        GLib.SocketClient client = new GLib.SocketClient () { protocol = SocketProtocol.UDP, type = SocketType.DATAGRAM };
-        GLib.SocketConnection connection;
 
         string discoveryMessage = "HF-A11ASSISTHREAD";
         var cancel = new GLib.Cancellable ();
-        string receiveBuffer = "";
+        string receiveBuffer = "extra long string to store data in hopefully";
 
         try
         {
             var addr = new InetAddress.from_string ("255.255.255.255");
+            //var addr = new InetAddress.from_string ("192.168.1.255");
             var address = new InetSocketAddress(addr, 48899);
-
-            //sock.bind (address, true);
             sock = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
             sock.set_broadcast (true);
+            sock.set_timeout (3);
+
+            debug (@"Sending message: $discoveryMessage\n");
             sock.send_to (address, discoveryMessage.data);
 
-            //connection = client.connect (address);
-            //connection.socket.set_broadcast (true);
+            debug("Starting 3 second timer...");
 
-            try
+            while (true)
             {
-                //connection.output_stream.write (discoveryMessage.data, cancel);
-
-                try
-                {
-                    while (!cancel.is_cancelled ())
-                    {
-                        //connection.input_stream.read (receiveBuffer.data, cancel);
-                        sock.receive (receiveBuffer.data, cancel);
-
-                        debug ("received: " + receiveBuffer);
-                    }
-                }
-                catch (GLib.IOError ex)
-                {
-                    debug (ex.message);
-                }
-            }
-            catch (GLib.IOError ex)
-            {
-                debug (ex.message);
+                var numBytes = sock.receive (receiveBuffer.data, cancel);
+                string recdIpAddress = receiveBuffer.split (",",0)[0];
+                debug (@"received $numBytes from $recdIpAddress\n");
+                discoveredLights.add (new Huely.Light () { name = "DicoveredLight 1", ipAddress = recdIpAddress});
             }
         }
         catch (GLib.Error ex)
         {
+            debug("times up!");
             debug (ex.message);
         }
 

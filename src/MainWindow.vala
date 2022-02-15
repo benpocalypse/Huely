@@ -168,12 +168,22 @@ namespace Huely {
 
             int i = 4;
             var btn = new Gtk.Button();
-            btn.set_label ("Add light!");
+            btn.set_label ("Discover Lighs");
+
+            /*
             btn.clicked.connect (() =>
             {
                 lightView.add_light (@"Light $i");
                 lightView.show_all ();
                 i++;
+            });
+            */
+
+            btn.clicked.connect (() =>
+            {
+                LightDiscovery dl = new LightDiscovery ();
+                lightView.add_light (dl.DiscoverLights ()[0]);
+                lightView.show_all();
             });
 
             headrbar1.add (btn);
@@ -200,9 +210,6 @@ namespace Huely {
             grid.attach (leaf2, 0, 1);
 
             add (grid);
-
-            LightDiscovery dl = new LightDiscovery ();
-            dl.DiscoverLights ();
         }
 
         [GtkCallback]

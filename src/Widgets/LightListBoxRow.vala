@@ -40,7 +40,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
             margin_right = 12
         };
 
-        _ipAddress  = new Gtk.Label ("192.168.1.16")
+        _ipAddress  = new Gtk.Label (light.ipAddress)
         {
             halign = Gtk.Align.START,
             margin_left = 12,
