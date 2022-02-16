@@ -1,5 +1,5 @@
 public class Huely.ObservableList<T> : Object, ListModel {
-  List<T> data = new List<T> ();
+  public List<T> data = new List<T> ();
 
   public void add (T item) {
     var position = data.length ();

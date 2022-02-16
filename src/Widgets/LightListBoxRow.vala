@@ -64,6 +64,11 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _lightColor.halign = Gtk.Align.END;
         _lightColor.margin = 5;
 
+        _lightColor.color_set.connect (() =>
+        {
+            light.color = _lightColor.get_rgba ().to_string();
+        });
+
         _horizontalBox.add (_verticalBox);
         _horizontalBox.add (_lightColor);
 

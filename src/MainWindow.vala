@@ -40,8 +40,8 @@ namespace Huely {
                 // the constructors. Anywhere else, they can be used interchangeably.
                 app: application,
                 application: application,                    // DON’T use in constructors; won’t have been assigned yet.
-                height_request: 420,
-                width_request: 420,
+                height_request: 200,
+                width_request: 200,
                 hide_titlebar_when_maximized: true,          // FIXME: This does not seem to have an effect. Why not?
                 icon_name: "com.github.benpocalypse.Huely"
             );
@@ -96,6 +96,7 @@ namespace Huely {
             leaf1 = new Hdy.Leaflet();
             leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf1.transition_type = Hdy.LeafletTransitionType.SLIDE;
+            leaf1.visible = true;
 
             headrbar1 = new Hdy.HeaderBar ();
             headrbar1.set_title ("Huely");
@@ -117,6 +118,13 @@ namespace Huely {
             headrGroup.add_header_bar (headrbar2);
             headrGroup.set_decorate_all (false);
 
+            headrGroup.update_decoration_layouts.connect (() =>
+            {
+                var test = leaf2.get_visible_child ();
+                var blerp = test.name;
+                debug (@"Visible child = $blerp");
+            });
+
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
             nameLabel.margin = 12;
             Gtk.Entry nameEntry = new Gtk.Entry ();
@@ -129,24 +137,17 @@ namespace Huely {
             Gtk.ColorChooserWidget colorChooser = new Gtk.ColorChooserWidget ();
             colorChooser.margin = 12;
 
-            Gtk.Button setButton = new Gtk.Button ();
-            setButton.margin = 5;
-            setButton.halign = Gtk.Align.END;
-            setButton.label = "Set";
-
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             contentBox.add (nameBox);
             contentBox.add (colorChooser);
-            contentBox.add (setButton);
 
-            Gtk.Button button1 = new Gtk.Button ();
-            button1.set_label ("Back");
+            Gtk.Button button1 = new Gtk.Button.from_icon_name ("go-previous-symbolic");
             button1.clicked.connect (on_back_button_clicked);
 
             leaf2 = new Hdy.Leaflet ();
             leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
-            leaf2.visible = true;
+            //leaf2.visible = true;
 
             Gtk.Label label = new Gtk.Label("Content");
             label.label = "Content";
@@ -164,26 +165,51 @@ namespace Huely {
             lightView.row_selected.connect ((row) =>
             {
                 nameEntry.text = ((LightListBoxRow)row).LightName.label;
+                leaf1.set_visible_child (headrbar2);
+                leaf2.set_visible_child (contentBox);
             });
 
-            int i = 4;
+            lightView.notify.connect (() =>
+            {
+               debug ("lightView updated!");
+            });
+
+            Gtk.Button setButton = new Gtk.Button ();
+            setButton.margin = 5;
+            setButton.halign = Gtk.Align.END;
+            setButton.label = "Set";
+            setButton.clicked.connect (() =>
+            {
+                ((LightListBoxRow)lightView.get_selected_row ()).set_name (nameEntry.text);
+
+                var rgba = colorChooser.get_rgba ();
+                uint8 red = ((uint8)(rgba.red * 255));
+                uint8 green = ((uint8)(rgba.green * 255));
+                uint8 blue = ((uint8)(rgba.blue * 255));
+
+                lightView.ViewModel.Lights[0].Connect ();
+                lightView.ViewModel.Lights[0].GetProtocol ();
+                lightView.ViewModel.Lights[0].SetColor (red, green, blue);
+            });
+
+            contentBox.add (setButton);
+
             var btn = new Gtk.Button();
             btn.set_label ("Discover Lighs");
-
-            /*
-            btn.clicked.connect (() =>
-            {
-                lightView.add_light (@"Light $i");
-                lightView.show_all ();
-                i++;
-            });
-            */
 
             btn.clicked.connect (() =>
             {
                 LightDiscovery dl = new LightDiscovery ();
-                lightView.add_light (dl.DiscoverLights ()[0]);
+                lightView.add_lights (dl.DiscoverLights ().data);
                 lightView.show_all();
+                /*
+
+                lightView.ViewModel.Lights[0].GetTime ();
+                var prot = lightView.ViewModel.Lights[0].GetProtocol ();
+                debug (@"Protocol = $prot");
+
+                lightView.ViewModel.Lights[0].SetColor (0xFE, 0, 0);
+                */
             });
 
             headrbar1.add (btn);
@@ -193,8 +219,8 @@ namespace Huely {
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
 
-            leaf1.set_visible_child (headrbar2);
-            leaf2.set_visible_child (contentBox);
+            //leaf1.set_visible_child (headrbar2);
+            //leaf2.set_visible_child (contentBox);
 
             // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
             Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);

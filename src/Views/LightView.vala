@@ -1,27 +1,23 @@
 public class Huely.LightView : Gtk.ListBox
 {
-    private Huely.LightViewModel _view_model = new Huely.LightViewModel ();
-
-    protected override void dispose ()
+    public Huely.LightViewModel ViewModel
     {
-        //this._scrolled_window.unparent ();
-        base.dispose ();
+        get;
+        default = new Huely.LightViewModel ();
     }
-
-/*
-    [GtkCallback (name = "load-more-students")]
-    private void load_more_students ()
-    {
-        this._view_model.load_more_students ();
-    }
-*/
 
     construct
     {
-        this.bind_model (this._view_model.lights , item =>
+        this.bind_model (this.ViewModel.Lights , item =>
         {
             return_val_if_fail (item is Huely.Light, null);
             return new LightListBoxRow ((Huely.Light) item);
+        });
+
+        ViewModel.notify.connect (() =>
+        {
+            this.notify_property ("ViewModel");
+            debug (@"Item added!");
         });
     }
 
@@ -32,17 +28,12 @@ public class Huely.LightView : Gtk.ListBox
 
     public void add_light (Huely.Light light)
     {
-        _view_model.lights.add (light);
+        ViewModel.Lights.add (light);
     }
 
-    public void add_lights (ObservableList<Huely.Light> lights)
+    public void add_lights (List<Huely.Light> lights)
     {
-        //_view_model.lights.add_all (lights);
-    }
-
-    public void add_fake_light (string name)
-    {
-        _view_model.lights.add (new Light () { name = name, color = "#FF0000", isOn = true });
+        ViewModel.Lights.add_all (lights);
     }
 }
 

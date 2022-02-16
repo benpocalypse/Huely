@@ -29,7 +29,7 @@ public class Huely.LightDiscovery : GLib.Object
                 var numBytes = sock.receive (receiveBuffer.data, cancel);
                 string recdIpAddress = receiveBuffer.split (",",0)[0];
                 debug (@"received $numBytes from $recdIpAddress\n");
-                discoveredLights.add (new Huely.Light () { name = "DicoveredLight 1", ipAddress = recdIpAddress});
+                discoveredLights.add (new Huely.Light () { name = "DicoveredLight 1", ipAddress = recdIpAddress, color = "#FFFFFF"});
             }
         }
         catch (GLib.Error ex)
