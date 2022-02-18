@@ -6,7 +6,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
     private Gtk.Label _ipAddress;
     private Gtk.ColorButton _lightColor = new Gtk.ColorButton ();
 
-    public Huely.Light? light { get; construct; }
+    public Huely.Light? light { get; set; }//construct; }
 
     construct
     {
@@ -18,20 +18,26 @@ public class LightListBoxRow : Gtk.ListBoxRow
                 "label",
                 BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
             );
-
-            /*
-            this.light.bind_property (
-                "last-name",
-                this._last_name_entry,
-                "text",
-                BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
-            );
-            */
         }
     }
 
-    public LightListBoxRow (Huely.Light light)
+/*
+    public LightListBoxRow copy ()
     {
+        return new LightListBoxRow ()
+        {
+            name = this.name,
+            ipAddress = this.ipAddress,
+            color = this.color,
+            isOn = this.isOn
+        };
+    }
+*/
+
+    public LightListBoxRow.with_light (Huely.Light light)
+    {
+        this.light = light;
+
         LightName  = new Gtk.Label (light.name)
         {
             halign = Gtk.Align.START,
@@ -58,7 +64,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _verticalBox.add (LightName);
         _verticalBox.add (_ipAddress);
 
-        var rgba = new Gdk.RGBA();
+        var rgba = new Gdk.RGBA ();
         rgba.parse (light.color);
         _lightColor.set_rgba (rgba);
         _lightColor.halign = Gtk.Align.END;
@@ -97,18 +103,18 @@ public class LightListBoxRow : Gtk.ListBoxRow
         return this;
     }
 
-    public LightListBoxRow with_ip_address (string ipAddress)
+    public LightListBoxRow.with_ip_address (string ipAddress)
     {
         set_ip_address (ipAddress);
-        return this;
+        //return this;
     }
 
-    public LightListBoxRow with_color (string rgba)
+    public LightListBoxRow.with_color (string rgba)
     {
         var rgbaColor = new Gdk.RGBA();
         rgbaColor.parse (rgba);
         _lightColor.set_rgba (rgbaColor);
 
-        return this;
+        //return this;
     }
 }

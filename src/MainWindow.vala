@@ -122,7 +122,7 @@ namespace Huely {
             {
                 var test = leaf2.get_visible_child ();
                 var blerp = test.name;
-                debug (@"Visible child = $blerp");
+                print (@"Visible child = $blerp");
             });
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
@@ -136,6 +136,33 @@ namespace Huely {
 
             Gtk.ColorChooserWidget colorChooser = new Gtk.ColorChooserWidget ();
             colorChooser.margin = 12;
+
+            Gdk.RGBA parser1 = new Gdk.RGBA();
+            parser1.parse ("#a0ddd3");
+            Gdk.RGBA parser2 = new Gdk.RGBA();
+            parser2.parse ("#6fb0b7");
+            Gdk.RGBA parser3 = new Gdk.RGBA();
+            parser3.parse ("#577f9d");
+            Gdk.RGBA parser4 = new Gdk.RGBA();
+            parser4.parse ("#4a5786");
+            Gdk.RGBA parser5 = new Gdk.RGBA();
+            parser5.parse ("#3e3b66");
+            Gdk.RGBA parser6 = new Gdk.RGBA();
+            parser6.parse ("#392945");
+            Gdk.RGBA parser7 = new Gdk.RGBA();
+            parser7.parse ("#2d1e2f");
+            Gdk.RGBA parser8 = new Gdk.RGBA();
+            parser8.parse ("#452e3f");
+            Gdk.RGBA parser9 = new Gdk.RGBA();
+            parser9.parse ("#5d4550");
+            Gdk.RGBA parser10 = new Gdk.RGBA();
+            parser10.parse ("#d8725e");
+            Gdk.RGBA parser11 = new Gdk.RGBA();
+            parser11.parse ("#f09f71");
+            Gdk.RGBA parser12 = new Gdk.RGBA();
+            parser12.parse ("#f7cf91");
+            Gdk.RGBA[] palette = {parser1,parser2,parser3,parser4,parser5,parser6,parser7,parser8, parser9,parser10,parser11,parser12};
+            colorChooser.add_palette (Gtk.Orientation.VERTICAL, 3, palette);
 
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             contentBox.add (nameBox);
@@ -171,7 +198,7 @@ namespace Huely {
 
             lightView.notify.connect (() =>
             {
-               debug ("lightView updated!");
+               print ("lightView updated!");
             });
 
             Gtk.Button setButton = new Gtk.Button ();
@@ -180,16 +207,21 @@ namespace Huely {
             setButton.label = "Set";
             setButton.clicked.connect (() =>
             {
-                ((LightListBoxRow)lightView.get_selected_row ()).set_name (nameEntry.text);
+                var row = ((LightListBoxRow)lightView.get_selected_row ());
 
                 var rgba = colorChooser.get_rgba ();
                 uint8 red = ((uint8)(rgba.red * 255));
                 uint8 green = ((uint8)(rgba.green * 255));
                 uint8 blue = ((uint8)(rgba.blue * 255));
 
-                lightView.ViewModel.Lights[0].Connect ();
-                lightView.ViewModel.Lights[0].GetProtocol ();
-                lightView.ViewModel.Lights[0].SetColor (red, green, blue);
+                row.set_name (nameEntry.text);
+                row.light.Connect ();
+                row.light.GetProtocol ();
+                row.light.SetColor (red, green, blue);
+
+                //lightView.ViewModel.Lights[0].Connect ();
+                //lightView.ViewModel.Lights[0].GetProtocol ();
+                //lightView.ViewModel.Lights[0].SetColor (red, green, blue);
             });
 
             contentBox.add (setButton);
@@ -199,6 +231,7 @@ namespace Huely {
 
             btn.clicked.connect (() =>
             {
+                print ("Disconvering lights...\n");
                 LightDiscovery dl = new LightDiscovery ();
                 lightView.add_lights (dl.DiscoverLights ().data);
                 lightView.show_all();

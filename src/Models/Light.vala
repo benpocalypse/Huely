@@ -82,13 +82,13 @@ public class Huely.Light : Object
             _socket.set_timeout (3);
             //_socket.bind (address, true);
             isConnected = _socket.connect (address);
-            debug (@"Connected = $isConnected");
+            print (@"Connected = $isConnected\n");
             //Refresh();
         }
         catch (GLib.Error error)
         {
             var msg = error.message;
-            debug (@"Failed to connect to light: $msg");
+            print (@"Failed to connect to light: $msg\n");
         }
     }
     // fixme - private
@@ -107,7 +107,7 @@ public class Huely.Light : Object
         catch (GLib.Error error)
         {
             var msg = error.message;
-            debug (@"Error, not LEDENET due to: $msg");
+            print (@"Error, not LEDENET due to: $msg\n");
             args = {0xef, 0x01, 0x77};
             SendData(args);
             try
@@ -119,7 +119,7 @@ public class Huely.Light : Object
             catch (GLib.Error error)
             {
                 msg = error.message;
-                debug (@"Error, not LEDENET_ORIGINAL due to: $msg");
+                print (@"Error, not LEDENET_ORIGINAL due to: $msg\n");
                 result = LedProtocol.Unknown;
             }
         }
@@ -199,7 +199,7 @@ public class Huely.Light : Object
         if (Protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
-            debug (@"args.length = $(args.length)");
+            print (@"args.length = $(args.length)");
             SendData (args);
         }
         else
@@ -229,7 +229,7 @@ public class Huely.Light : Object
             data[8]
         );
 
-        debug (@"Time = $time");
+        print (@"Time = $time");
 
         return time;
     }
@@ -260,7 +260,7 @@ public class Huely.Light : Object
                 {
                     test += d.to_string() + ", ";
                 }
-                debug (@"Sending: $test");
+                print (@"Sending: $test");
 
                 _socket.send (finalData);
             }
@@ -271,7 +271,7 @@ public class Huely.Light : Object
                 {
                     test += d.to_string() + ", ";
                 }
-                debug (@"Sending: $test");
+                print (@"Sending: $test");
 
                 _socket.send (_data);
             }
@@ -279,7 +279,7 @@ public class Huely.Light : Object
         catch (GLib.Error error)
         {
             var msg = error.message;
-            debug (@"Failed to send data: $msg");
+            print (@"Failed to send data: $msg\n");
         }
     }
 

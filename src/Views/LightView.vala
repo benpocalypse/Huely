@@ -11,13 +11,13 @@ public class Huely.LightView : Gtk.ListBox
         this.bind_model (this.ViewModel.Lights , item =>
         {
             return_val_if_fail (item is Huely.Light, null);
-            return new LightListBoxRow ((Huely.Light) item);
+            return new LightListBoxRow.with_light ((Huely.Light) item);
         });
 
         ViewModel.notify.connect (() =>
         {
             this.notify_property ("ViewModel");
-            debug (@"Item added!");
+            print (@"Item added to LightView!\n");
         });
     }
 
