@@ -34,6 +34,11 @@ public class Huely.ObservableList<T> : Object, ListModel {
     return true;
   }
 
+  public void clear ()
+  {
+      data = new List<T> ();
+  }
+
   Object? get_item (uint position) {
     return this[position] as Object;
   }

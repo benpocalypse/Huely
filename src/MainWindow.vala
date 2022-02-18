@@ -189,11 +189,36 @@ namespace Huely {
             titlebar.add(leaf1);
 
             LightView lightView = new LightView ();
+
+            Gtk.Button setButton = new Gtk.Button ();
+            setButton.margin = 5;
+            setButton.halign = Gtk.Align.END;
+            setButton.label = "Set";
+            setButton.clicked.connect (() =>
+            {
+                if (lightView.get_selected_row () != null)
+                {
+                    ((LightListBoxRow)lightView.get_selected_row ()).set_name (nameEntry.text);
+
+                    var rgba = colorChooser.get_rgba ();
+                    uint8 red = ((uint8)(rgba.red * 255));
+                    uint8 green = ((uint8)(rgba.green * 255));
+                    uint8 blue = ((uint8)(rgba.blue * 255));
+
+                    lightView.ViewModel.Lights[0].Connect ();
+                    lightView.ViewModel.Lights[0].GetProtocol ();
+                    lightView.ViewModel.Lights[0].SetColor (red, green, blue);
+                }
+            });
+
+            setButton.set_sensitive (false);
+
             lightView.row_selected.connect ((row) =>
             {
                 nameEntry.text = ((LightListBoxRow)row).LightName.label;
                 leaf1.set_visible_child (headrbar2);
                 leaf2.set_visible_child (contentBox);
+                setButton.set_sensitive (true);
             });
 
             lightView.notify.connect (() =>
@@ -233,6 +258,7 @@ namespace Huely {
             {
                 print ("Disconvering lights...\n");
                 LightDiscovery dl = new LightDiscovery ();
+                lightView.clear ();
                 lightView.add_lights (dl.DiscoverLights ().data);
                 lightView.show_all();
                 /*
