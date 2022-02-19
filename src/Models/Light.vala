@@ -57,7 +57,17 @@ public class Huely.Light : Object
         Protocol = LedProtocol.Unknown;
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+    }
 
+    public Light.with_ip (string ip)
+    {
+        isConnected = false;
+        useChecksum = true;
+        Protocol = LedProtocol.Unknown;
+        ipAddress = ip;
+
+        _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+        this.Connect ();
     }
 
     public Light copy ()
@@ -79,8 +89,7 @@ public class Huely.Light : Object
 
         try
         {
-            _socket.set_timeout (3);
-            //_socket.bind (address, true);
+            _socket.set_timeout (1);
             isConnected = _socket.connect (address);
             print (@"Connected = $isConnected\n");
             GetProtocol ();
@@ -160,10 +169,12 @@ public class Huely.Light : Object
         //Check power state.
         if (dataHex[2] == "23")
         {
+            print ("Light.isOn = true\n");
             isOn = true;
         }
         else if (dataHex[2] == "24")
         {
+            print ("Light.isOn = false\n");
             isOn = false;
         }
 
@@ -264,7 +275,7 @@ public class Huely.Light : Object
         if (Protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
-            print (@"args.length = $(args.length)");
+            print (@"args.length = $(args.length)\n");
             SendData (args);
         }
         else
@@ -294,7 +305,7 @@ public class Huely.Light : Object
             data[8]
         );
 
-        print (@"Time = $time");
+        print (@"Time = $time\n");
 
         return time;
     }
@@ -311,8 +322,6 @@ public class Huely.Light : Object
             csum = csum & 0xFF;
         }
 
-        GLib.Cancellable cancel = new GLib.Cancellable ();
-
         try
         {
             if (useChecksum == true)
@@ -325,7 +334,7 @@ public class Huely.Light : Object
                 {
                     test += d.to_string() + ", ";
                 }
-                print (@"Sending: $test");
+                print (@"Sending: $test\n");
 
                 _socket.send (finalData);
             }
@@ -336,15 +345,14 @@ public class Huely.Light : Object
                 {
                     test += d.to_string() + ", ";
                 }
-                print (@"Sending: $test");
+                print (@"Sending: $test\n");
 
                 _socket.send (_data);
             }
         }
         catch (GLib.Error error)
         {
-            var msg = error.message;
-            print (@"Failed to send data: $msg\n");
+            print (@"Failed to send data: $(error.message)\n");
         }
     }
 
@@ -352,7 +360,15 @@ public class Huely.Light : Object
     {
         uint8[] buffer = new uint8[14];
         GLib.Cancellable cancel = new GLib.Cancellable ();
-        _socket.receive (buffer, cancel);
+
+        try
+        {
+            _socket.receive (buffer, cancel);
+        }
+        catch (GLib.Error error)
+        {
+            print (@"Failed to receive data: $(error.message)\n");
+        }
 
         return buffer;
     }

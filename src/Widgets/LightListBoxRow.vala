@@ -56,22 +56,26 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _verticalBox.add (_lightName);
         _verticalBox.add (_ipAddress);
 
-        Huely.RoundColorButton _colorButton = new Huely.RoundColorButton(Huely.AccentColor.NO_PREFERENCE);
-        _colorButton.margin = 3;
-        _colorButton.halign = Gtk.Align.END;
-        _colorButton.toggled.connect (() =>
+        var colorButton = new Gtk.CheckButton ();
+        var colorButtonStyle = colorButton.get_style_context ();
+        colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
+        colorButton.margin = 3;
+        colorButton.halign = Gtk.Align.END;
+        colorButton.toggled.connect (() =>
         {
-            light.set_on (_colorButton.get_active());
+            light.set_on (colorButton.get_active());
         });
-        light.notify.connect (() =>
+        light.notify["isOn"].connect (() =>
         {
-            print (@"isOn = $(light.isOn)");
-            _colorButton.set_active(light.isOn);
+            print (@"isOn = $(light.isOn)\n");
+            colorButton.set_active(light.isOn);
         });
 
+        //colorButton.set_active (true);
+
         _horizontalBox.add (_verticalBox);
-        _horizontalBox.add (_colorButton);
-        _horizontalBox.set_child_packing (_colorButton, true, true, 0, Gtk.PackType.END );
+        _horizontalBox.add (colorButton);
+        _horizontalBox.set_child_packing (colorButton, true, true, 0, Gtk.PackType.END );
 
         add (_horizontalBox);
 

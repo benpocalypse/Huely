@@ -42,7 +42,6 @@ executable(
     'src' / 'ViewModels' / 'LightViewModel.vala',
     'src' / 'Views' / 'LightView.vala',
     'src' / 'Widgets' / 'LightListBoxRow.vala',
-    'src' / 'Widgets' / 'RoundColorButton.vala',
 
     config_header,
     dependencies: [

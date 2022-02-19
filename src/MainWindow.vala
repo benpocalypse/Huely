@@ -103,9 +103,6 @@ namespace Huely {
             headrbar1.visible = true;
             headrbar1.show_close_button = true;
 
-            Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
-            separator.visible = true;
-
             headrbar2 = new Hdy.HeaderBar ();
             headrbar2.set_title ("Details");
             headrbar2.visible = true;
@@ -156,29 +153,29 @@ namespace Huely {
             colorChooser.margin = 12;
 
             // TODO - Make a proper palette parser or something. This is ugly.
-            Gdk.RGBA parser1 = new Gdk.RGBA();
+            Gdk.RGBA parser1 = Gdk.RGBA ();
             parser1.parse ("#a0ddd3");
-            Gdk.RGBA parser2 = new Gdk.RGBA();
+            Gdk.RGBA parser2 = Gdk.RGBA();
             parser2.parse ("#6fb0b7");
-            Gdk.RGBA parser3 = new Gdk.RGBA();
+            Gdk.RGBA parser3 = Gdk.RGBA();
             parser3.parse ("#577f9d");
-            Gdk.RGBA parser4 = new Gdk.RGBA();
+            Gdk.RGBA parser4 = Gdk.RGBA();
             parser4.parse ("#4a5786");
-            Gdk.RGBA parser5 = new Gdk.RGBA();
+            Gdk.RGBA parser5 = Gdk.RGBA();
             parser5.parse ("#3e3b66");
-            Gdk.RGBA parser6 = new Gdk.RGBA();
+            Gdk.RGBA parser6 = Gdk.RGBA();
             parser6.parse ("#392945");
-            Gdk.RGBA parser7 = new Gdk.RGBA();
+            Gdk.RGBA parser7 = Gdk.RGBA();
             parser7.parse ("#2d1e2f");
-            Gdk.RGBA parser8 = new Gdk.RGBA();
+            Gdk.RGBA parser8 = Gdk.RGBA();
             parser8.parse ("#452e3f");
-            Gdk.RGBA parser9 = new Gdk.RGBA();
+            Gdk.RGBA parser9 = Gdk.RGBA();
             parser9.parse ("#5d4550");
-            Gdk.RGBA parser10 = new Gdk.RGBA();
+            Gdk.RGBA parser10 = Gdk.RGBA();
             parser10.parse ("#d8725e");
-            Gdk.RGBA parser11 = new Gdk.RGBA();
+            Gdk.RGBA parser11 = Gdk.RGBA();
             parser11.parse ("#f09f71");
-            Gdk.RGBA parser12 = new Gdk.RGBA();
+            Gdk.RGBA parser12 = Gdk.RGBA();
             parser12.parse ("#f7cf91");
             Gdk.RGBA[] palette = {parser1,parser2,parser3,parser4,parser5,parser6,parser7,parser8, parser9,parser10,parser11,parser12};
             colorChooser.add_palette (Gtk.Orientation.VERTICAL, 3, palette);
@@ -192,7 +189,6 @@ namespace Huely {
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
 
             leaf1.add (headrbar1);
-            leaf1.add (separator);
             headrbar2.add (button1);
             leaf1.add (headrbar2);
 
@@ -226,7 +222,6 @@ namespace Huely {
             lightView.row_selected.connect ((row) =>
             {
                 var lightRow = ((LightListBoxRow)row);
-                lightRow.light.Connect ();
                 nameEntry.text = lightRow.LightName;
                 leaf1.set_visible_child (headrbar2);
                 leaf2.set_visible_child (contentBox);
@@ -240,10 +235,10 @@ namespace Huely {
 
             contentBox.add (setButton);
 
-            var btn = new Gtk.Button.from_icon_name ("system-search-symbolic");
-            btn.margin = 5;
+            var searchButton = new Gtk.Button.from_icon_name ("system-search-symbolic");
+            searchButton.margin = 5;
 
-            btn.clicked.connect (() =>
+            searchButton.clicked.connect (() =>
             {
                 print ("Disconvering lights...\n");
                 LightDiscovery dl = new LightDiscovery ();
@@ -252,9 +247,10 @@ namespace Huely {
                 lightView.show_all();
             });
 
-            headrbar1.add (btn);
+            headrbar1.add (searchButton);
 
             scrolledWindow = new Gtk.ScrolledWindow (null, null);
+            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
             scrolledWindow.add (lightView);
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
