@@ -57,7 +57,8 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _verticalBox.add (_ipAddress);
 
         Huely.RoundColorButton _colorButton = new Huely.RoundColorButton(Huely.AccentColor.NO_PREFERENCE);
-        _colorButton.margin = 5;
+        _colorButton.margin = 3;
+        _colorButton.halign = Gtk.Align.END;
         _colorButton.toggled.connect (() =>
         {
             light.set_on (_colorButton.get_active());
@@ -70,6 +71,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
         _horizontalBox.add (_verticalBox);
         _horizontalBox.add (_colorButton);
+        _horizontalBox.set_child_packing (_colorButton, true, true, 0, Gtk.PackType.END );
 
         add (_horizontalBox);
 

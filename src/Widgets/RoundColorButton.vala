@@ -40,6 +40,8 @@ public enum Huely.AccentColor
     }
 }
 
+
+// TODO - Repurpose this whole class.
 public class Huely.RoundColorButton: Gtk.CheckButton
 {
 

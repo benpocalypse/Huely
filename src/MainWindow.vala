@@ -107,22 +107,40 @@ namespace Huely {
             separator.visible = true;
 
             headrbar2 = new Hdy.HeaderBar ();
-            headrbar2.set_title ("Content");
-            headrbar2.name = "content";
+            headrbar2.set_title ("Details");
             headrbar2.visible = true;
             headrbar2.hexpand = true;
             headrbar2.show_close_button = true;
+
+            Gtk.Button button1 = new Gtk.Button.from_icon_name ("go-previous-symbolic");
+            button1.clicked.connect (on_back_button_clicked);
 
             Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
             headrGroup.add_header_bar (headrbar1);
             headrGroup.add_header_bar (headrbar2);
             headrGroup.set_decorate_all (false);
 
+            // This 'ugliness' is responsible for hiding/showing the back button
+            // on the Details pane when size permits.
             headrGroup.update_decoration_layouts.connect (() =>
             {
-                var test = leaf2.get_visible_child ();
-                var blerp = test.name;
-                print (@"Visible child = $blerp");
+                var childName = leaf2.get_visible_child ().name;
+
+                if (childName == "GtkScrolledWindow")
+                {
+                    button1.visible = false;
+                }
+                else
+                {
+                    if (childName == "GtkBox" && button1.visible == true)
+                    {
+                        button1.visible = false;
+                    }
+                    else
+                    {
+                        button1.visible = true;
+                    }
+                }
             });
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
@@ -137,6 +155,7 @@ namespace Huely {
             Gtk.ColorChooserWidget colorChooser = new Gtk.ColorChooserWidget ();
             colorChooser.margin = 12;
 
+            // TODO - Make a proper palette parser or something. This is ugly.
             Gdk.RGBA parser1 = new Gdk.RGBA();
             parser1.parse ("#a0ddd3");
             Gdk.RGBA parser2 = new Gdk.RGBA();
@@ -168,22 +187,13 @@ namespace Huely {
             contentBox.add (nameBox);
             contentBox.add (colorChooser);
 
-            Gtk.Button button1 = new Gtk.Button.from_icon_name ("go-previous-symbolic");
-            button1.clicked.connect (on_back_button_clicked);
-
             leaf2 = new Hdy.Leaflet ();
             leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
-            //leaf2.visible = true;
-
-            Gtk.Label label = new Gtk.Label("Content");
-            label.label = "Content";
 
             leaf1.add (headrbar1);
             leaf1.add (separator);
-
             headrbar2.add (button1);
-
             leaf1.add (headrbar2);
 
             titlebar.add(leaf1);
@@ -225,13 +235,13 @@ namespace Huely {
 
             lightView.notify.connect (() =>
             {
-               print ("lightView updated!");
+               print ("lightView updated!\n");
             });
 
             contentBox.add (setButton);
 
-            var btn = new Gtk.Button();
-            btn.set_label ("Discover Lighs");
+            var btn = new Gtk.Button.from_icon_name ("system-search-symbolic");
+            btn.margin = 5;
 
             btn.clicked.connect (() =>
             {
@@ -248,9 +258,6 @@ namespace Huely {
             scrolledWindow.add (lightView);
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
-
-            //leaf1.set_visible_child (headrbar2);
-            //leaf2.set_visible_child (contentBox);
 
             // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
             Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
