@@ -2,9 +2,14 @@ public class LightListBoxRow : Gtk.ListBoxRow
 {
     private Gtk.Box _verticalBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
     private Gtk.Box _horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-    public Gtk.Label LightName;
+
+    public string LightName
+    {
+        get { return _lightName.label; }
+        set { _lightName.label = value; }
+    }
+    public Gtk.Label _lightName;
     private Gtk.Label _ipAddress;
-    private Gtk.ColorButton _lightColor = new Gtk.ColorButton ();
 
     public Huely.Light? light { get; set; }//construct; }
 
@@ -14,31 +19,18 @@ public class LightListBoxRow : Gtk.ListBoxRow
         {
             this.light.bind_property (
                 "name",
-                this.LightName,
+                this._lightName,
                 "label",
                 BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
             );
         }
     }
 
-/*
-    public LightListBoxRow copy ()
-    {
-        return new LightListBoxRow ()
-        {
-            name = this.name,
-            ipAddress = this.ipAddress,
-            color = this.color,
-            isOn = this.isOn
-        };
-    }
-*/
-
     public LightListBoxRow.with_light (Huely.Light light)
     {
         this.light = light;
 
-        LightName  = new Gtk.Label (light.name)
+        _lightName  = new Gtk.Label (light.name)
         {
             halign = Gtk.Align.START,
             margin_left = 12,
@@ -61,22 +53,23 @@ public class LightListBoxRow : Gtk.ListBoxRow
         font.set_style (Pango.Style.ITALIC);
         _ipAddress.override_font (font);
 
-        _verticalBox.add (LightName);
+        _verticalBox.add (_lightName);
         _verticalBox.add (_ipAddress);
 
-        var rgba = new Gdk.RGBA ();
-        rgba.parse (light.color);
-        _lightColor.set_rgba (rgba);
-        _lightColor.halign = Gtk.Align.END;
-        _lightColor.margin = 5;
-
-        _lightColor.color_set.connect (() =>
+        Huely.RoundColorButton _colorButton = new Huely.RoundColorButton(Huely.AccentColor.NO_PREFERENCE);
+        _colorButton.margin = 5;
+        _colorButton.toggled.connect (() =>
         {
-            light.color = _lightColor.get_rgba ().to_string();
+            light.set_on (_colorButton.get_active());
+        });
+        light.notify.connect (() =>
+        {
+            print (@"isOn = $(light.isOn)");
+            _colorButton.set_active(light.isOn);
         });
 
         _horizontalBox.add (_verticalBox);
-        _horizontalBox.add (_lightColor);
+        _horizontalBox.add (_colorButton);
 
         add (_horizontalBox);
 
@@ -89,7 +82,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
     public void set_name (string name)
     {
-        LightName.set_label (name);
+        _lightName.set_label (name);
     }
 
     public void set_ip_address (string ipAddress)
@@ -106,15 +99,6 @@ public class LightListBoxRow : Gtk.ListBoxRow
     public LightListBoxRow.with_ip_address (string ipAddress)
     {
         set_ip_address (ipAddress);
-        //return this;
-    }
-
-    public LightListBoxRow.with_color (string rgba)
-    {
-        var rgbaColor = new Gdk.RGBA();
-        rgbaColor.parse (rgba);
-        _lightColor.set_rgba (rgbaColor);
-
         //return this;
     }
 }

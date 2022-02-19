@@ -83,7 +83,8 @@ public class Huely.Light : Object
             //_socket.bind (address, true);
             isConnected = _socket.connect (address);
             print (@"Connected = $isConnected\n");
-            //Refresh();
+            GetProtocol ();
+            Refresh ();
         }
         catch (GLib.Error error)
         {
@@ -91,8 +92,9 @@ public class Huely.Light : Object
             print (@"Failed to connect to light: $msg\n");
         }
     }
-    // fixme - private
-    public LedProtocol GetProtocol ()
+
+
+    private LedProtocol GetProtocol ()
     {
         LedProtocol result = LedProtocol.Unknown;
         uint8[] args = {0x81, 0x8a, 0x8b};
@@ -146,6 +148,25 @@ public class Huely.Light : Object
             }
         }
 
+        var dataRaw = ReadData ();
+        string[] dataHex = new string[14];
+        for (int i = 0; i < dataHex.length; i++)
+            dataHex[i] = dataRaw[i].to_string ("X");
+
+        if (Protocol == LedProtocol.LEDENET_ORIGINAL)
+        if (dataHex[1] == "01")
+            useChecksum = false;
+
+        //Check power state.
+        if (dataHex[2] == "23")
+        {
+            isOn = true;
+        }
+        else if (dataHex[2] == "24")
+        {
+            isOn = false;
+        }
+
         /*
         //Read and process the response.
         var dataRaw = await ReadDataAsync();
@@ -192,6 +213,50 @@ public class Huely.Light : Object
         Time = await GetTimeAsync();
 
         */
+    }
+
+    public void set_on (bool on)
+    {
+        if (on == true)
+        {
+            TurnOn ();
+        }
+        else
+        {
+            TurnOff ();
+        }
+    }
+
+    public void TurnOn ()
+    {
+        if (Protocol == LedProtocol.LEDENET)
+        {
+            uint8[] args = {0x71, 0x23, 0x0f};
+            SendData (args);
+        }
+        else
+        {
+            uint8[] args = {0xcc, 0x23, 0x33};
+            SendData (args);
+        }
+
+        isOn = true;
+    }
+
+    public void TurnOff ()
+    {
+        if (Protocol == LedProtocol.LEDENET)
+        {
+            uint8[] args = {0x71, 0x24, 0x0f};
+            SendData (args);
+        }
+        else
+        {
+            uint8[] args = {0xcc, 0x24, 0x33};
+            SendData (args);
+        }
+
+        isOn = false;
     }
 
     public void SetColor (uint8 red, uint8 green, uint8 blue)

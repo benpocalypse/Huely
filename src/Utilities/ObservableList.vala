@@ -34,10 +34,15 @@ public class Huely.ObservableList<T> : Object, ListModel {
     return true;
   }
 
-  public void clear ()
-  {
-      data = new List<T> ();
-  }
+    public void clear ()
+    {
+        var total = data.length ();
+
+        foreach (var item in data)
+            data.remove (item);
+
+        items_changed (0,total,0);
+    }
 
   Object? get_item (uint position) {
     return this[position] as Object;

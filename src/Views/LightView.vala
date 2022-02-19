@@ -21,14 +21,10 @@ public class Huely.LightView : Gtk.ListBox
         });
     }
 
-    static construct
-    {
-        //set_css_name ("studentview");
-    }
-
     public void clear ()
     {
         ViewModel.Lights.clear ();
+        this.show_all ();
     }
 
     public void add_light (Huely.Light light)
