@@ -6,9 +6,12 @@ public class Huely.Light : Object
     public bool isOn { get; set; }
     public bool isConnected { get; set; }
     public bool useChecksum { get; set; }
+    public uint8 brightness { get; private set; }
+    public LedProtocol protocol { get; private set; }
+    public DateTime time { get; private set; }
 
     public enum TransitionType { Gradual = 0x3a, Strobe = 0x3c, Jump = 0x3b }
-    public enum LedProtocol { LEDENET, LEDENET_ORIGINAL, Unknown }
+    public enum LedProtocol { LEDENET, LEDENET_ORIGINAL, UNKNOWN }
     public enum LightMode { Color, WarmWhite, Preset, Custom, Unknown }
     public enum PresetPattern
     {
@@ -34,17 +37,8 @@ public class Huely.Light : Object
         SevenColorsJumping = 0x38
     }
 
-    /// <summary> The date and time of the light. </summary>
-    public DateTime Time { get; private set; }
-    /// <summary> The protocol of the light. </summary>
-    public LedProtocol Protocol { get; private set; }
-    /// <summary> The color of the light. </summary>
-    /// <summary> The warm white value of the light. </summary>
+    // TODO - Decide if I want to keep/implement these.
     public uint8 WarmWhite { get; private set; }
-    /// <summary> The brightness of the light, from 0 to 100. </summary>
-    public uint8 Brightness { get; private set; }
-    /// <summary> Specifies whether the light is on or off. </summary>
-    /// <summary> Specifies the mode of the light (Color, Preset, White, Custom). </summary>
     public LightMode Mode { get; private set; }
 
     private GLib.Socket _socket;
@@ -54,7 +48,7 @@ public class Huely.Light : Object
     {
         isConnected = false;
         useChecksum = true;
-        Protocol = LedProtocol.Unknown;
+        protocol = LedProtocol.UNKNOWN;
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
     }
@@ -63,7 +57,7 @@ public class Huely.Light : Object
     {
         isConnected = false;
         useChecksum = true;
-        Protocol = LedProtocol.Unknown;
+        protocol = LedProtocol.UNKNOWN;
         ipAddress = ip;
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
@@ -105,9 +99,9 @@ public class Huely.Light : Object
 
     private LedProtocol GetProtocol ()
     {
-        LedProtocol result = LedProtocol.Unknown;
+        LedProtocol result = LedProtocol.UNKNOWN;
         uint8[] args = {0x81, 0x8a, 0x8b};
-        SendData(args);
+        send_data (args);
         try
         {
             uint8[] buffer_ledenet = new uint8[14];
@@ -120,7 +114,7 @@ public class Huely.Light : Object
             var msg = error.message;
             print (@"Error, not LEDENET due to: $msg\n");
             args = {0xef, 0x01, 0x77};
-            SendData(args);
+            send_data(args);
             try
             {
                 uint8[] buffer_original = new uint8[14];
@@ -131,11 +125,11 @@ public class Huely.Light : Object
             {
                 msg = error.message;
                 print (@"Error, not LEDENET_ORIGINAL due to: $msg\n");
-                result = LedProtocol.Unknown;
+                result = LedProtocol.UNKNOWN;
             }
         }
 
-        Protocol = result;
+        protocol = result;
 
         return result;
     }
@@ -143,28 +137,29 @@ public class Huely.Light : Object
     public void Refresh ()
     {
         //Send request for status.
-        if (Protocol == LedProtocol.LEDENET)
+        if (protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x81, 0x8a, 0x8b};
-            SendData (args);
+            send_data (args);
         }
         else
         {
-            if (Protocol == LedProtocol.LEDENET_ORIGINAL)
+            if (protocol == LedProtocol.LEDENET_ORIGINAL)
             {
                 uint8[] args = {0xef, 0x01, 0x77};
-                SendData (args);
+                send_data (args);
             }
         }
 
-        var dataRaw = ReadData ();
+        var dataRaw = read_data ();
         string[] dataHex = new string[14];
         for (int i = 0; i < dataHex.length; i++)
             dataHex[i] = dataRaw[i].to_string ("X");
 
-        if (Protocol == LedProtocol.LEDENET_ORIGINAL)
-        if (dataHex[1] == "01")
+        if (protocol == LedProtocol.LEDENET_ORIGINAL && dataHex[1] == "01")
+        {
             useChecksum = false;
+        }
 
         //Check power state.
         if (dataHex[2] == "23")
@@ -179,23 +174,6 @@ public class Huely.Light : Object
         }
 
         /*
-        //Read and process the response.
-        var dataRaw = await ReadDataAsync();
-        string[] dataHex = new string[14];
-        for (int i = 0; i < dataHex.Length; i++)
-            dataHex[i] = dataRaw[i].ToString("X");
-
-        //Check if it uses checksum.
-        if (Protocol == LedProtocol.LEDENET_ORIGINAL)
-            if (dataHex[1] == "01")
-                UseCsum = false;
-
-        //Check power state.
-        if (dataHex[2] == "23")
-            Power = true;
-        else if (dataHex[2] == "24")
-            Power = false;
-
         //Check light mode.
         Mode = Utilis.DetermineMode(dataHex[3], dataHex[9]);
 
@@ -222,66 +200,65 @@ public class Huely.Light : Object
 
         //Send request to get the time of the light.
         Time = await GetTimeAsync();
-
         */
     }
 
-    public void set_on (bool on)
+    public void set_state (bool turnOn)
     {
-        if (on == true)
+        if (turnOn == true)
         {
-            TurnOn ();
+            turn_on ();
         }
         else
         {
-            TurnOff ();
+            turn_off ();
         }
     }
 
-    public void TurnOn ()
+    private void turn_on ()
     {
-        if (Protocol == LedProtocol.LEDENET)
+        if (protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x71, 0x23, 0x0f};
-            SendData (args);
+            send_data (args);
         }
         else
         {
             uint8[] args = {0xcc, 0x23, 0x33};
-            SendData (args);
+            send_data (args);
         }
 
         isOn = true;
     }
 
-    public void TurnOff ()
+    private void turn_off ()
     {
-        if (Protocol == LedProtocol.LEDENET)
+        if (protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x71, 0x24, 0x0f};
-            SendData (args);
+            send_data (args);
         }
         else
         {
             uint8[] args = {0xcc, 0x24, 0x33};
-            SendData (args);
+            send_data (args);
         }
 
         isOn = false;
     }
 
-    public void SetColor (uint8 red, uint8 green, uint8 blue)
+    public void set_color (uint8 red, uint8 green, uint8 blue)
     {
-        if (Protocol == LedProtocol.LEDENET)
+        if (protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
             print (@"args.length = $(args.length)\n");
-            SendData (args);
+            send_data (args);
         }
         else
         {
             uint8[] args = {0x56, red, green, blue, 0xAA};
-            SendData (args);
+            send_data (args);
         }
 
         //Populate fields
@@ -291,11 +268,11 @@ public class Huely.Light : Object
     }
 
 
-    public DateTime GetTime ()
+    public DateTime get_time ()
     {
         uint8[] args = {0x11, 0x1a, 0x1b, 0x0f};
-        SendData (args);
-        uint8[] data = ReadData ();
+        send_data (args);
+        uint8[] data = read_data ();
         var time = new GLib.DateTime.local(
             data[3] + 2000,
             data[4],
@@ -310,7 +287,7 @@ public class Huely.Light : Object
         return time;
     }
 
-    private void SendData (uint8[] _data)
+    private void send_data (uint8[] _data)
     {
         uint8 csum = 0;
         if (useChecksum == true)
@@ -356,7 +333,7 @@ public class Huely.Light : Object
         }
     }
 
-    private uint8[] ReadData ()
+    private uint8[] read_data ()
     {
         uint8[] buffer = new uint8[14];
         GLib.Cancellable cancel = new GLib.Cancellable ();

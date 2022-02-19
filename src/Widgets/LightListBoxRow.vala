@@ -63,7 +63,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
         colorButton.halign = Gtk.Align.END;
         colorButton.toggled.connect (() =>
         {
-            light.set_on (colorButton.get_active());
+            light.set_state (colorButton.get_active());
         });
         light.notify["isOn"].connect (() =>
         {

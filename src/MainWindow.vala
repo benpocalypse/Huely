@@ -213,7 +213,7 @@ namespace Huely {
 
                     row.set_name (nameEntry.text);
                     row.light.Connect ();
-                    row.light.SetColor (red, green, blue);
+                    row.light.set_color (red, green, blue);
                 }
             });
 
@@ -241,9 +241,19 @@ namespace Huely {
             searchButton.clicked.connect (() =>
             {
                 print ("Disconvering lights...\n");
-                LightDiscovery dl = new LightDiscovery ();
                 lightView.clear ();
-                lightView.add_lights (dl.DiscoverLights ().data);
+
+                LightDiscovery dl = new LightDiscovery ();
+                ObservableList<Huely.Light> lights = new ObservableList<Huely.Light> ();
+                var loop = new MainLoop();
+                dl.DiscoverLightsAsync.begin((obj, res) =>
+                {
+                    lights = dl.DiscoverLightsAsync.end (res);
+                    loop.quit();
+                });
+                loop.run();
+
+                lightView.add_lights (lights.data);
                 lightView.show_all();
             });
 
