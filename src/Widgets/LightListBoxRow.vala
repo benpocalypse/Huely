@@ -61,17 +61,18 @@ public class LightListBoxRow : Gtk.ListBoxRow
         colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
         colorButton.margin = 3;
         colorButton.halign = Gtk.Align.END;
+        colorButton.set_active(light.isOn);
+
         colorButton.toggled.connect (() =>
         {
             light.set_state (colorButton.get_active());
         });
-        light.notify["isOn"].connect (() =>
+
+        light.notify.connect (() =>
         {
-            print (@"isOn = $(light.isOn)\n");
+            print (@"LightListBoxRow.isOn = $(light.isOn)\n");
             colorButton.set_active(light.isOn);
         });
-
-        //colorButton.set_active (true);
 
         _horizontalBox.add (_verticalBox);
         _horizontalBox.add (colorButton);

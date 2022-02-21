@@ -17,7 +17,7 @@ public class Huely.LightView : Gtk.ListBox
         ViewModel.notify.connect (() =>
         {
             this.notify_property ("ViewModel");
-            print (@"Item added to LightView!\n");
+            print (@"LightView.Item added to LightView!\n");
         });
     }
 

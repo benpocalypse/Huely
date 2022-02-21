@@ -109,8 +109,13 @@ namespace Huely {
             headrbar2.hexpand = true;
             headrbar2.show_close_button = true;
 
-            Gtk.Button button1 = new Gtk.Button.from_icon_name ("go-previous-symbolic");
-            button1.clicked.connect (on_back_button_clicked);
+            Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
+            backButton.clicked.connect (on_back_button_clicked);
+
+            Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("application-menu-symbolic");
+
+            // TODO - implement this popover.
+            Gtk.Popover popover = new Gtk.Popover (settingsButton);
 
             Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
             headrGroup.add_header_bar (headrbar1);
@@ -125,17 +130,17 @@ namespace Huely {
 
                 if (childName == "GtkScrolledWindow")
                 {
-                    button1.visible = false;
+                    backButton.visible = false;
                 }
                 else
                 {
-                    if (childName == "GtkBox" && button1.visible == true)
+                    if (childName == "GtkBox" && backButton.visible == true)
                     {
-                        button1.visible = false;
+                        backButton.visible = false;
                     }
                     else
                     {
-                        button1.visible = true;
+                        backButton.visible = true;
                     }
                 }
             });
@@ -153,6 +158,52 @@ namespace Huely {
             colorChooser.margin = 12;
 
             // TODO - Make a proper palette parser or something. This is ugly.
+            string [] paletteStrings =
+            {
+                "#ffffff",
+                "#fb6b1d",
+                "#e83b3b",
+                "#831c5d",
+                "#c32454",
+                "#f04f78",
+                "#f68181",
+                "#fca790",
+                "#e3c896",
+                "#ab947a",
+                "#966c6c",
+                "#625565",
+                "#3e3546",
+                "#0b5e65",
+                "#0b8a8f",
+                "#1ebc73",
+                "#91db69",
+                "#fbff86",
+                "#fbb954",
+                "#cd683d",
+                "#9e4539",
+                "#7a3045",
+                "#6b3e75",
+                "#905ea9",
+                "#a884f3",
+                "#eaaded",
+                "#8fd3ff",
+                "#4d9be6",
+                "#4d65b4",
+                "#484a77",
+                "#30e1b9",
+                "#8ff8e2"
+            };
+
+            Gdk.RGBA[] palette = new Gdk.RGBA[0];
+
+            foreach (var s in paletteStrings)
+            {
+                Gdk.RGBA parser = Gdk.RGBA ();
+                parser.parse (s);
+                palette += parser;
+            }
+
+            /*
             Gdk.RGBA parser1 = Gdk.RGBA ();
             parser1.parse ("#a0ddd3");
             Gdk.RGBA parser2 = Gdk.RGBA();
@@ -178,7 +229,8 @@ namespace Huely {
             Gdk.RGBA parser12 = Gdk.RGBA();
             parser12.parse ("#f7cf91");
             Gdk.RGBA[] palette = {parser1,parser2,parser3,parser4,parser5,parser6,parser7,parser8, parser9,parser10,parser11,parser12};
-            colorChooser.add_palette (Gtk.Orientation.VERTICAL, 3, palette);
+            */
+            colorChooser.add_palette (Gtk.Orientation.VERTICAL, 8, palette);
 
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             contentBox.add (nameBox);
@@ -189,7 +241,8 @@ namespace Huely {
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
 
             leaf1.add (headrbar1);
-            headrbar2.add (button1);
+            headrbar2.pack_start (backButton);
+            headrbar2.pack_end (settingsButton);
             leaf1.add (headrbar2);
 
             titlebar.add(leaf1);
@@ -213,7 +266,7 @@ namespace Huely {
 
                     row.set_name (nameEntry.text);
                     row.light.Connect ();
-                    row.light.set_color (red, green, blue);
+                    row.light.set_color2 (red, green, blue);
                 }
             });
 
@@ -230,16 +283,29 @@ namespace Huely {
 
             lightView.notify.connect (() =>
             {
-               print ("lightView updated!\n");
+               print ("MainWindow.lightView updated!\n");
             });
 
             contentBox.add (setButton);
 
-            var searchButton = new Gtk.Button.from_icon_name ("system-search-symbolic");
+            var searchButton = new Gtk.Button.from_icon_name ("list-add-symbolic");//"system-search-symbolic");
             searchButton.margin = 5;
+
+            Gtk.Spinner spinner = new Gtk.Spinner ();
+            spinner.visible = true;
+            spinner.width_request = 32;
+            spinner.height_request = 32;
+
+            scrolledWindow = new Gtk.ScrolledWindow (null, null);
+            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+            scrolledWindow.add (lightView);
 
             searchButton.clicked.connect (() =>
             {
+                scrolledWindow.remove (lightView);
+                scrolledWindow.add (spinner);
+                spinner.start ();
+
                 print ("Disconvering lights...\n");
                 lightView.clear ();
 
@@ -255,13 +321,14 @@ namespace Huely {
 
                 lightView.add_lights (lights.data);
                 lightView.show_all();
+
+                spinner.stop ();
+                scrolledWindow.remove (spinner);
+                scrolledWindow.add (lightView);
             });
 
             headrbar1.add (searchButton);
 
-            scrolledWindow = new Gtk.ScrolledWindow (null, null);
-            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
-            scrolledWindow.add (lightView);
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
 

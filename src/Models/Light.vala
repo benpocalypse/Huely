@@ -44,13 +44,14 @@ public class Huely.Light : Object
     private GLib.Socket _socket;
     private const uint16 PORT = 5577;
 
-    public Light()
+    public Light ()
     {
         isConnected = false;
         useChecksum = true;
         protocol = LedProtocol.UNKNOWN;
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+        this.Connect ();
     }
 
     public Light.with_ip (string ip)
@@ -62,17 +63,6 @@ public class Huely.Light : Object
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
         this.Connect ();
-    }
-
-    public Light copy ()
-    {
-        return new Light ()
-        {
-            name = this.name,
-            ipAddress = this.ipAddress,
-            color = this.color,
-            isOn = this.isOn
-        };
     }
 
     // Communications functions
@@ -99,6 +89,7 @@ public class Huely.Light : Object
 
     private LedProtocol GetProtocol ()
     {
+        print ("GetProtocol ()\n");
         LedProtocol result = LedProtocol.UNKNOWN;
         uint8[] args = {0x81, 0x8a, 0x8b};
         send_data (args);
@@ -136,6 +127,7 @@ public class Huely.Light : Object
 
     public void Refresh ()
     {
+        print ("Refresh ()\n");
         //Send request for status.
         if (protocol == LedProtocol.LEDENET)
         {
@@ -153,24 +145,34 @@ public class Huely.Light : Object
 
         var dataRaw = read_data ();
         string[] dataHex = new string[14];
-        for (int i = 0; i < dataHex.length; i++)
-            dataHex[i] = dataRaw[i].to_string ("X");
 
+        // TODO - Why even bother to convert it to hex strings?
+        print ("dataHex = ");
+        for (int i = 0; i < dataHex.length; i++)
+        {
+            dataHex[i] = dataRaw[i].to_string ("%x");
+            print (dataHex[i] +", ");
+        }
+        print ("\n");
+
+        // TODO - not sure what this one is supposed to be equal to.
         if (protocol == LedProtocol.LEDENET_ORIGINAL && dataHex[1] == "01")
         {
             useChecksum = false;
         }
 
         //Check power state.
-        if (dataHex[2] == "23")
+        if (dataRaw[2] == 35)
         {
-            print ("Light.isOn = true\n");
+            print (@"Light.isOn = $isOn\n");
             isOn = true;
+            print (@"Light.isOn = $isOn\n");
         }
-        else if (dataHex[2] == "24")
+        else if (dataRaw[2] == 36)
         {
-            print ("Light.isOn = false\n");
+            print (@"Light.isOn = $isOn\n");
             isOn = false;
+            print (@"Light.isOn = $isOn\n");
         }
 
         /*
@@ -247,8 +249,14 @@ public class Huely.Light : Object
         isOn = false;
     }
 
-    public void set_color (uint8 red, uint8 green, uint8 blue)
+    public void set_color2(uint8 red, uint8 green, uint8 blue)
     {
+        // FIXME - is this because we actually have 2 instances of this class? One in our ObservableList, and one in our LightListBoxRow?
+        if (isConnected == false)
+        {
+            Connect ();
+        }
+
         if (protocol == LedProtocol.LEDENET)
         {
             uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
@@ -268,10 +276,9 @@ public class Huely.Light : Object
     }
 
 
-    public DateTime get_time ()
+    public DateTime get_time2 ()
     {
-        uint8[] args = {0x11, 0x1a, 0x1b, 0x0f};
-        send_data (args);
+        send_data (new uint8[] {0x11, 0x1a, 0x1b, 0x0f});
         uint8[] data = read_data ();
         var time = new GLib.DateTime.local(
             data[3] + 2000,
@@ -341,6 +348,14 @@ public class Huely.Light : Object
         try
         {
             _socket.receive (buffer, cancel);
+
+            print ("Received: ");
+            foreach (var i in buffer)
+            {
+                print (@"$(i), ");
+            }
+
+            print ("\n");
         }
         catch (GLib.Error error)
         {
