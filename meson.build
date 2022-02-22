@@ -2,7 +2,7 @@ project(
     'com.github.benpocalypse.Huely',
     'vala',
     'c',
-    version: '1.0.0'
+    version: '0.1.0'
 )
 
 i18n = import('i18n')

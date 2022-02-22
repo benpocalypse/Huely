@@ -92,6 +92,9 @@ namespace Huely {
             // See https://gnome.pages.gitlab.gnome.org/libhandy/doc/1-latest/HdyHeaderBar.html
 
             Hdy.TitleBar titlebar = new Hdy.TitleBar();
+            Hdy.Deck deck1 = new Hdy.Deck ();
+            Gtk.Box aboutBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            Gtk.Box mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
             leaf1 = new Hdy.Leaflet();
             leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
@@ -117,8 +120,18 @@ namespace Huely {
             settingsButton.clicked.connect (() =>
             {
                 Gtk.Box menuBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-                menuBox.pack_start (new Gtk.Label ("Help") { margin = 10 });
-                menuBox.pack_start (new Gtk.Label ("About") { margin = 10 });
+
+                var helpButton = new Gtk.ModelButton ();
+                helpButton.text = "Help";
+                helpButton.clicked.connect (() =>  GLib.AppInfo.launch_default_for_uri ("https://github.com/benpocalypse/Huely", new GLib.AppLaunchContext ()));
+
+                var aboutButton = new Gtk.ModelButton ();
+                aboutButton.text = "About";
+                aboutButton.clicked.connect (() => deck1.set_visible_child (aboutBox));
+
+                menuBox.pack_start (helpButton);
+                menuBox.pack_start (aboutButton);
+
                 Gtk.Popover popover = new Gtk.Popover (settingsButton);
                 popover.add (menuBox);
                 popover.show_all ();
@@ -153,16 +166,19 @@ namespace Huely {
             });
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
+            nameLabel.vexpand = false;
             nameLabel.margin = 12;
             Gtk.Entry nameEntry = new Gtk.Entry ();
+            nameEntry.vexpand = false;
             nameEntry.margin = 5;
             nameEntry.margin_top = 10;
             Gtk.Box nameBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            nameBox.vexpand = false;
             nameBox.add (nameLabel);
             nameBox.add (nameEntry);
 
             // TODO - Make a proper palette parser or something. This is ugly.
-            string [] paletteStrings =
+            string [] paletteStrings1 =
             {
                 "#ffffff",
                 "#fb6b1d",
@@ -198,13 +214,50 @@ namespace Huely {
                 "#8ff8e2"
             };
 
+            string [] paletteStrings =
+            {
+                "#6074ab",
+                "#6b9acf",
+                "#8bbde6",
+                "#aae0f3",
+                "#c8eded",
+                "#faffe0",
+                "#dde6e0",
+                "#b4bec2",
+                "#949da8",
+                "#7a7a99",
+                "#5b5280",
+                "#4e3161",
+                "#421e42",
+                "#612447",
+                "#7a3757",
+                "#96485b",
+                "#bd6868",
+                "#d18b79",
+                "#dbac8c",
+                "#e6cfa1",
+                "#e7ebbc",
+                "#b2dba0",
+                "#87c293",
+                "#70a18f",
+                "#637c8f",
+                "#b56e75",
+                "#c98f8f",
+                "#dfb6ae",
+                "#edd5ca",
+                "#bd7182",
+                "#9e5476",
+                "#753c6a"
+            };
+
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            contentBox.valign = Gtk.Align.FILL;
 
             Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
             chooser.margin = 10;
 
-            contentBox.add (nameBox);
-            contentBox.add (chooser);
+            contentBox.pack_start (nameBox, false, false);
+            contentBox.pack_start (chooser, false, false);
 
             leaf2 = new Hdy.Leaflet ();
             leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
@@ -257,12 +310,13 @@ namespace Huely {
                print ("MainWindow.lightView updated!\n");
             });
 
-            contentBox.add (setButton);
+            contentBox.pack_start (setButton, false, false);
 
             var searchButton = new Gtk.Button.from_icon_name ("sync-synchronizing-symbolic");//"list-add-symbolic");//"system-search-symbolic");
             searchButton.margin = 5;
 
             scrolledWindow = new Gtk.ScrolledWindow (null, null);
+            scrolledWindow.valign = Gtk.Align.FILL;
             scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
             scrolledWindow.add (lightView);
 
@@ -311,6 +365,37 @@ namespace Huely {
 
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
+            leaf2.valign = Gtk.Align.FILL;
+
+            Hdy.HeaderBar aboutHeader = new Hdy.HeaderBar ();
+            Gtk.Button aboutBackButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
+
+            aboutBackButton.clicked.connect (() =>
+            {
+                deck1.set_visible_child (mainBox);
+            });
+
+            aboutHeader.set_title ("About");
+            aboutHeader.show_close_button = true;
+            aboutHeader.pack_start (aboutBackButton);
+
+            var aboutImage = new Gtk.Image.from_icon_name ("com.github.benpocalypse.Huely", Gtk.IconSize.DIALOG);
+            aboutImage.pixel_size = 128;
+
+            aboutBox.pack_start (aboutHeader, false, false);
+            aboutBox.pack_start (aboutImage, false, false, 10);
+
+            var aboutNameLabel = new Gtk.Label ("");
+            aboutNameLabel.set_markup ("<b>Huely</b>");
+
+            var aboutWebsiteLabel = new Gtk.Label("");
+            aboutWebsiteLabel.set_markup ("<a href='https://github.com/benpocalypse/Huely'>Website</a>");
+            aboutBox.pack_start (aboutNameLabel, false, false);
+            aboutBox.pack_start (new Gtk.Label (@"v$(Constants.Config.VERSION)"), false, false);
+            aboutBox.pack_start (aboutWebsiteLabel, false, false, 10);
+            aboutBox.pack_start (new Gtk.Label (@"Color your workspace."), false, false);
+            aboutBox.pack_start (new Gtk.Label (@"© Ben Foote"), false, false);
+            aboutBox.pack_end (new Gtk.Label (""), true, true);
 
             // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
             Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
@@ -321,11 +406,13 @@ namespace Huely {
             sizegroup3.add_widget (headrbar2);
             sizegroup3.add_widget (contentBox);
 
-            Gtk.Grid grid = new Gtk.Grid();
-            grid.attach (titlebar, 0, 0);
-            grid.attach (leaf2, 0, 1);
+            mainBox.pack_start (titlebar, false, false);
+            mainBox.pack_start (leaf2, true, true);
 
-            add (grid);
+            deck1.prepend (aboutBox);
+            deck1.prepend (mainBox);
+
+            add (deck1);
         }
 
         [GtkCallback]

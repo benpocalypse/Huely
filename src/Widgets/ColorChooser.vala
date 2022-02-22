@@ -12,6 +12,8 @@ public class Huely.ColorChooser : Gtk.Grid
         int x = 0;
         int y = 0;
 
+        bool firstButton = true;
+
         foreach (var s in paletteString)
         {
             Gdk.RGBA parser = Gdk.RGBA ();
@@ -19,6 +21,15 @@ public class Huely.ColorChooser : Gtk.Grid
             palette += parser;
 
             Huely.ColorGridButton colorButton = new Huely.ColorGridButton ();
+
+            if (firstButton)
+            {
+                colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
+                SelectedColor = parser;
+                _previouslyClickedButton = colorButton;
+                firstButton = false;
+            }
+
             colorButton.Row = y;
             colorButton.Column = x;
             colorButton.Color = parser;

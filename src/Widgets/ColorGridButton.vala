@@ -10,7 +10,7 @@ public class Huely.ColorGridButton : Gtk.Button
         set
         {
             this.override_background_color (Gtk.StateFlags.NORMAL, value);
-            this.override_color (Gtk.StateFlags.NORMAL, value);
+            //this.override_color (Gtk.StateFlags.NORMAL, value);
             this._color = value;
         }
     }

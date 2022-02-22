@@ -20,12 +20,12 @@ public class Huely.LightDiscovery : GLib.Object
                 var address = new InetSocketAddress(addr, 48899);
                 sock = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
                 sock.set_broadcast (true);
-                sock.set_timeout (5);
+                sock.set_timeout (3);
 
                 print (@"Sending message: $discoveryMessage\n");
                 sock.send_to (address, discoveryMessage.data);
 
-                print ("Starting 5 second timer...\n");
+                print ("Starting 3 second timer...\n");
 
                 int numLights = 1;
 
