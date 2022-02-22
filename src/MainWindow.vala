@@ -114,8 +114,15 @@ namespace Huely {
 
             Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("application-menu-symbolic");
 
-            // TODO - implement this popover.
-            Gtk.Popover popover = new Gtk.Popover (settingsButton);
+            settingsButton.clicked.connect (() =>
+            {
+                Gtk.Box menuBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                menuBox.pack_start (new Gtk.Label ("Help") { margin = 10 });
+                menuBox.pack_start (new Gtk.Label ("About") { margin = 10 });
+                Gtk.Popover popover = new Gtk.Popover (settingsButton);
+                popover.add (menuBox);
+                popover.show_all ();
+            });
 
             Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
             headrGroup.add_header_bar (headrbar1);
@@ -194,7 +201,7 @@ namespace Huely {
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
             Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
-            chooser.margin = 5;
+            chooser.margin = 10;
 
             contentBox.add (nameBox);
             contentBox.add (chooser);
@@ -213,7 +220,8 @@ namespace Huely {
             LightView lightView = new LightView ();
 
             Gtk.Button setButton = new Gtk.Button ();
-            setButton.margin = 5;
+            setButton.margin_right = 10;
+            setButton.margin_bottom = 10;
             setButton.halign = Gtk.Align.END;
             setButton.label = "Set";
             setButton.clicked.connect (() =>

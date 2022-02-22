@@ -2,7 +2,18 @@ public class Huely.ColorGridButton : Gtk.Button
 {
     public int Column { get; set; }
     public int Row { get; set; }
-    public Gdk.RGBA Color { get; set; }
+
+    private Gdk.RGBA _color;
+    public Gdk.RGBA Color //{ get; set; }
+    {
+        get { return this._color; }
+        set
+        {
+            this.override_background_color (Gtk.StateFlags.NORMAL, value);
+            this.override_color (Gtk.StateFlags.NORMAL, value);
+            this._color = value;
+        }
+    }
 
     public ColorGridButton.from_icon_name (string iconName, Gtk.IconSize? size)
     {

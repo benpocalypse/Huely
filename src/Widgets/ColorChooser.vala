@@ -24,7 +24,6 @@ public class Huely.ColorChooser : Gtk.Grid
             colorButton.Color = parser;
             colorButton.height_request = 25;
             colorButton.width_request = 50;
-            colorButton.override_background_color (Gtk.StateFlags.NORMAL, parser);
 
             colorButton.clicked.connect ((btn) =>
             {
@@ -71,7 +70,6 @@ public class Huely.ColorChooser : Gtk.Grid
 
             _previouslyClickedButton.height_request = 25;
             _previouslyClickedButton.width_request = 50;
-            _previouslyClickedButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
             _previouslyClickedButton.Row = tempRow;
             _previouslyClickedButton.Column = tempCol;
             _previouslyClickedButton.Color = tempColor;
@@ -97,7 +95,6 @@ public class Huely.ColorChooser : Gtk.Grid
         Huely.ColorGridButton colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
         colorButton.height_request = 25;
         colorButton.width_request = 50;
-        colorButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
         colorButton.Row = tempRow;
         colorButton.Column = tempCol;
         colorButton.Color = tempColor;
