@@ -115,7 +115,7 @@ namespace Huely {
             Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
             backButton.clicked.connect (on_back_button_clicked);
 
-            Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("application-menu-symbolic");
+            Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
 
             settingsButton.clicked.connect (() =>
             {
@@ -312,7 +312,7 @@ namespace Huely {
 
             contentBox.pack_start (setButton, false, false);
 
-            var searchButton = new Gtk.Button.from_icon_name ("sync-synchronizing-symbolic");//"list-add-symbolic");//"system-search-symbolic");
+            var searchButton = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
             searchButton.margin = 5;
 
             scrolledWindow = new Gtk.ScrolledWindow (null, null);

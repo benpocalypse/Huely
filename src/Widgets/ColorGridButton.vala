@@ -9,7 +9,20 @@ public class Huely.ColorGridButton : Gtk.Button
         get { return this._color; }
         set
         {
-            this.override_background_color (Gtk.StateFlags.NORMAL, value);
+            Gtk.CssProvider prov = new Gtk.CssProvider ();
+
+            string red = ((uint8)(value.red * 255)).to_string ("%x");
+            string green = ((uint8)(value.green * 255)).to_string ("%x");
+            string blue = ((uint8)(value.blue * 255)).to_string ("%x");
+
+            string cssData = @"* { background: #$red$green$blue; }";
+            print (@"cssData = $cssData\n");
+            prov.load_from_data (cssData, cssData.length);
+            var context = this.get_style_context ();
+            context.add_provider (prov, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
+            //this.add_provider (prov, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+            //this.override_background_color (Gtk.StateFlags.NORMAL, value);
             //this.override_color (Gtk.StateFlags.NORMAL, value);
             this._color = value;
         }
