@@ -1,6 +1,7 @@
 public class Huely.ColorChooser : Gtk.Grid
 {
-    private Huely.ColorGridButton previouslyClickedButton = null;
+    public Gdk.RGBA SelectedColor;
+    private Huely.ColorGridButton _previouslyClickedButton = null;
 
     public ColorChooser (int numColumns, string [] paletteString)
     {
@@ -17,7 +18,7 @@ public class Huely.ColorChooser : Gtk.Grid
             parser.parse (s);
             palette += parser;
 
-            Huely.ColorGridButton colorButton = new Huely.ColorGridButton ();//.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
+            Huely.ColorGridButton colorButton = new Huely.ColorGridButton ();
             colorButton.Row = y;
             colorButton.Column = x;
             colorButton.Color = parser;
@@ -25,54 +26,11 @@ public class Huely.ColorChooser : Gtk.Grid
             colorButton.width_request = 50;
             colorButton.override_background_color (Gtk.StateFlags.NORMAL, parser);
 
-            colorButton.clicked.connect (() =>
+            colorButton.clicked.connect ((btn) =>
             {
-                int tempCol;
-                int tempRow;
-                Gdk.RGBA tempColor;
-
-                if (previouslyClickedButton != null)
-                {
-                    tempRow = previouslyClickedButton.Row;
-                    tempCol = previouslyClickedButton.Column;
-                    tempColor = previouslyClickedButton.Color;
-
-                    this.remove (previouslyClickedButton);
-
-                    previouslyClickedButton = new Huely.ColorGridButton.without_icon ();
-
-                    previouslyClickedButton.height_request = 25;
-                    previouslyClickedButton.width_request = 50;
-                    previouslyClickedButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
-                    previouslyClickedButton.Row = tempRow;
-                    previouslyClickedButton.Column = tempCol;
-                    previouslyClickedButton.Color = tempColor;
-
-                    this.attach (previouslyClickedButton, previouslyClickedButton.Column, previouslyClickedButton.Row);
-                }
-
-                tempCol = colorButton.Column;
-                tempRow = colorButton.Row;
-                tempColor = colorButton.Color;
-
-                print (@"colorButton.Column = $(tempCol), colorButton.Row = $(tempRow)\n");
-
-                this.remove (colorButton);
-
-                colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
-                colorButton.height_request = 25;
-                colorButton.width_request = 50;
-                colorButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
-                colorButton.Row = tempRow;
-                colorButton.Column = tempCol;
-                colorButton.Color = tempColor;
-
-                print (@"colorButton.Column = $(colorButton.Column), colorButton.Row = $(colorButton.Row)\n");
-
-                previouslyClickedButton = colorButton;
-                this.attach (colorButton, colorButton.Column, colorButton.Row);
-
-                this.show_all ();
+                SelectedColor = ((Huely.ColorGridButton)btn).Color;
+                handlePreviousButtonClick();
+                handleClick((Huely.ColorGridButton)btn);
             });
 
             this.attach (colorButton, x, y);
@@ -87,5 +45,74 @@ public class Huely.ColorChooser : Gtk.Grid
                 y++;
             }
         }
+    }
+
+    private void handlePreviousButtonClick ()
+    {
+        if (_previouslyClickedButton != null)
+        {
+            int tempCol;
+            int tempRow;
+            Gdk.RGBA tempColor;
+
+            tempRow = _previouslyClickedButton.Row;
+            tempCol = _previouslyClickedButton.Column;
+            tempColor = _previouslyClickedButton.Color;
+
+            this.remove (_previouslyClickedButton);
+
+            _previouslyClickedButton = new Huely.ColorGridButton.without_icon ();
+
+            _previouslyClickedButton.clicked.connect ((btn) =>
+            {
+                handlePreviousButtonClick();
+                handleClick ((Huely.ColorGridButton)btn);
+            });
+
+            _previouslyClickedButton.height_request = 25;
+            _previouslyClickedButton.width_request = 50;
+            _previouslyClickedButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
+            _previouslyClickedButton.Row = tempRow;
+            _previouslyClickedButton.Column = tempCol;
+            _previouslyClickedButton.Color = tempColor;
+
+            this.attach (_previouslyClickedButton, _previouslyClickedButton.Column, _previouslyClickedButton.Row);
+        }
+    }
+
+    private void handleClick (Huely.ColorGridButton btn)
+    {
+        int tempCol;
+        int tempRow;
+        Gdk.RGBA tempColor;
+
+        tempCol = btn.Column;
+        tempRow = btn.Row;
+        tempColor = btn.Color;
+
+        print (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
+
+        this.remove (btn);
+
+        Huely.ColorGridButton colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
+        colorButton.height_request = 25;
+        colorButton.width_request = 50;
+        colorButton.override_background_color (Gtk.StateFlags.NORMAL, tempColor);
+        colorButton.Row = tempRow;
+        colorButton.Column = tempCol;
+        colorButton.Color = tempColor;
+
+        _previouslyClickedButton = colorButton;
+
+        colorButton.clicked.connect ((btn) =>
+        {
+            handlePreviousButtonClick();
+            handleClick((Huely.ColorGridButton)btn);
+        });
+
+        print (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
+        this.attach (colorButton, colorButton.Column, colorButton.Row);
+
+        this.show_all ();
     }
 }

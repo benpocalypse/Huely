@@ -154,9 +154,6 @@ namespace Huely {
             nameBox.add (nameLabel);
             nameBox.add (nameEntry);
 
-            Gtk.ColorChooserWidget colorChooser = new Gtk.ColorChooserWidget ();
-            colorChooser.margin = 12;
-
             // TODO - Make a proper palette parser or something. This is ugly.
             string [] paletteStrings =
             {
@@ -202,9 +199,6 @@ namespace Huely {
             contentBox.add (nameBox);
             contentBox.add (chooser);
 
-            //contentBox.add (colorButton);
-            //contentBox.add (colorChooser);
-
             leaf2 = new Hdy.Leaflet ();
             leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
@@ -228,7 +222,7 @@ namespace Huely {
                 {
                     var row = ((LightListBoxRow)lightView.get_selected_row ());
 
-                    var rgba = colorChooser.get_rgba ();
+                    var rgba = chooser.SelectedColor;
                     uint8 red = ((uint8)(rgba.red * 255));
                     uint8 green = ((uint8)(rgba.green * 255));
                     uint8 blue = ((uint8)(rgba.blue * 255));
