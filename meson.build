@@ -42,6 +42,8 @@ executable(
     'src' / 'ViewModels' / 'LightViewModel.vala',
     'src' / 'Views' / 'LightView.vala',
     'src' / 'Widgets' / 'LightListBoxRow.vala',
+    'src' / 'Widgets' / 'ColorChooser.vala',
+    'src' / 'Widgets' / 'ColorGridButton.vala',
 
     config_header,
     dependencies: [

@@ -194,47 +194,16 @@ namespace Huely {
                 "#8ff8e2"
             };
 
-            Gdk.RGBA[] palette = new Gdk.RGBA[0];
-
-            foreach (var s in paletteStrings)
-            {
-                Gdk.RGBA parser = Gdk.RGBA ();
-                parser.parse (s);
-                palette += parser;
-            }
-
-            /*
-            Gdk.RGBA parser1 = Gdk.RGBA ();
-            parser1.parse ("#a0ddd3");
-            Gdk.RGBA parser2 = Gdk.RGBA();
-            parser2.parse ("#6fb0b7");
-            Gdk.RGBA parser3 = Gdk.RGBA();
-            parser3.parse ("#577f9d");
-            Gdk.RGBA parser4 = Gdk.RGBA();
-            parser4.parse ("#4a5786");
-            Gdk.RGBA parser5 = Gdk.RGBA();
-            parser5.parse ("#3e3b66");
-            Gdk.RGBA parser6 = Gdk.RGBA();
-            parser6.parse ("#392945");
-            Gdk.RGBA parser7 = Gdk.RGBA();
-            parser7.parse ("#2d1e2f");
-            Gdk.RGBA parser8 = Gdk.RGBA();
-            parser8.parse ("#452e3f");
-            Gdk.RGBA parser9 = Gdk.RGBA();
-            parser9.parse ("#5d4550");
-            Gdk.RGBA parser10 = Gdk.RGBA();
-            parser10.parse ("#d8725e");
-            Gdk.RGBA parser11 = Gdk.RGBA();
-            parser11.parse ("#f09f71");
-            Gdk.RGBA parser12 = Gdk.RGBA();
-            parser12.parse ("#f7cf91");
-            Gdk.RGBA[] palette = {parser1,parser2,parser3,parser4,parser5,parser6,parser7,parser8, parser9,parser10,parser11,parser12};
-            */
-            colorChooser.add_palette (Gtk.Orientation.VERTICAL, 8, palette);
-
             contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+
+            Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
+            chooser.margin = 5;
+
             contentBox.add (nameBox);
-            contentBox.add (colorChooser);
+            contentBox.add (chooser);
+
+            //contentBox.add (colorButton);
+            //contentBox.add (colorChooser);
 
             leaf2 = new Hdy.Leaflet ();
             leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
@@ -288,13 +257,8 @@ namespace Huely {
 
             contentBox.add (setButton);
 
-            var searchButton = new Gtk.Button.from_icon_name ("list-add-symbolic");//"system-search-symbolic");
+            var searchButton = new Gtk.Button.from_icon_name ("sync-synchronizing-symbolic");//"list-add-symbolic");//"system-search-symbolic");
             searchButton.margin = 5;
-
-            Gtk.Spinner spinner = new Gtk.Spinner ();
-            spinner.visible = true;
-            spinner.width_request = 32;
-            spinner.height_request = 32;
 
             scrolledWindow = new Gtk.ScrolledWindow (null, null);
             scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
@@ -302,11 +266,24 @@ namespace Huely {
 
             searchButton.clicked.connect (() =>
             {
+                Gtk.Box spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                spinnerBox.valign = Gtk.Align.CENTER;
+                Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
+
+                Gtk.Spinner spinner = new Gtk.Spinner ();
+                spinner.margin = 10;
+                spinner.width_request = 32;
+                spinner.height_request = 32;
+
+                spinnerBox.add (spinner);
+                spinnerBox.add (spinnerLabel);
+
                 scrolledWindow.remove (lightView);
-                scrolledWindow.add (spinner);
+                scrolledWindow.add (spinnerBox);
+                scrolledWindow.show_all ();
                 spinner.start ();
 
-                print ("Disconvering lights...\n");
+                print ("Searching for lights...\n");
                 lightView.clear ();
 
                 LightDiscovery dl = new LightDiscovery ();
@@ -323,8 +300,9 @@ namespace Huely {
                 lightView.show_all();
 
                 spinner.stop ();
-                scrolledWindow.remove (spinner);
+                scrolledWindow.remove (spinnerBox);
                 scrolledWindow.add (lightView);
+                scrolledWindow.show_all ();
             });
 
             headrbar1.add (searchButton);
