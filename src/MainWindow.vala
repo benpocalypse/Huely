@@ -113,7 +113,11 @@ namespace Huely {
             headrbar2.show_close_button = true;
 
             Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
-            backButton.clicked.connect (on_back_button_clicked);
+            backButton.clicked.connect (() =>
+            {
+                leaf1.set_visible_child (headrbar1);
+                leaf2.set_visible_child (scrolledWindow);
+            });
 
             Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
 
@@ -415,25 +419,12 @@ namespace Huely {
             add (deck1);
         }
 
-        [GtkCallback]
-        public void on_switch_button_clicked ()
-        {
-            leaf1.set_visible_child (headrbar2);
-            leaf2.set_visible_child (contentBox);
-        }
-
-        [GtkCallback]
-        public void on_back_button_clicked ()
-        {
-            leaf1.set_visible_child (headrbar1);
-            leaf2.set_visible_child (scrolledWindow);
-        }
-
         // State preservation.
-
-        private void set_up_state_preservation () {
+        private void set_up_state_preservation ()
+        {
             // Before the window is deleted, preserve its state.
-            delete_event.connect (() => {
+            delete_event.connect (() =>
+            {
                 preserve_window_state ();
                 return false;
             });
@@ -444,9 +435,20 @@ namespace Huely {
             Unix.signal_add (Posix.Signal.TERM, quit_gracefully, Priority.HIGH);
         }
 
-        private void restore_window_state () {
+        private void restore_window_state ()
+        {
             var rect = Gdk.Rectangle ();
             Huely.saved_state.get ("window-size", "(ii)", out rect.width, out rect.height);
+
+            string lightName;
+            string lightIp;
+            int numLights;
+
+            numLights = Huely.saved_state.get_int ("numLights");
+            lightName = Huely.saved_state.get_string ("lightName1");
+            lightIp = Huely.saved_state.get_string ("lightIp1");
+
+            print (@"light: $(numLights) , $(lightName), $(lightIp)\n");
 
             default_width = rect.width;
             default_height = rect.height;
@@ -468,14 +470,21 @@ namespace Huely {
             }
         }
 
-        private void preserve_window_state () {
+        private void preserve_window_state ()
+        {
             // Persist window dimensions and location.
             var state = get_window ().get_state ();
-            if (Gdk.WindowState.MAXIMIZED in state) {
+
+            if (Gdk.WindowState.MAXIMIZED in state)
+            {
                 Huely.saved_state.set_enum ("window-state", WindowState.MAXIMIZED);
-            } else if (Gdk.WindowState.FULLSCREEN in state) {
+            }
+            else if (Gdk.WindowState.FULLSCREEN in state)
+            {
                 Huely.saved_state.set_enum ("window-state", WindowState.FULLSCREEN);
-            } else {
+            }
+            else
+            {
                 Huely.saved_state.set_enum ("window-state", WindowState.NORMAL);
                 // Save window size
                 int width, height;
@@ -486,17 +495,23 @@ namespace Huely {
             int x, y;
             get_position (out x, out y);
             Huely.saved_state.set ("window-position", "(ii)", x, y);
+
+            Huely.saved_state.set_value ("numLights", 1);
+            Huely.saved_state.set_value ("lightName1", "My Light Name");
+            Huely.saved_state.set_value ("lightIp1",  "192.168.1.1");
         }
 
         // Actions.
 
-        private void set_up_actions () {
+        private void set_up_actions ()
+        {
             // Setup actions and their accelerators.
             actions = new SimpleActionGroup ();
             actions.add_action_entries (ACTION_ENTRIES, this);
             insert_action_group ("win", actions);
 
-            foreach (var action in action_accelerators.get_keys ()) {
+            foreach (var action in action_accelerators.get_keys ())
+            {
                 var accels_array = action_accelerators[action].to_array ();
                 accels_array += null;
 
@@ -506,22 +521,28 @@ namespace Huely {
 
         // Action handlers.
 
-        private void action_fullscreen () {
-            if (Gdk.WindowState.FULLSCREEN in get_window ().get_state ()) {
+        private void action_fullscreen ()
+        {
+            if (Gdk.WindowState.FULLSCREEN in get_window ().get_state ())
+            {
                 unfullscreen ();
-            } else {
+            }
+            else
+            {
                 fullscreen ();
             }
         }
 
-        private void action_quit () {
+        private void action_quit ()
+        {
             preserve_window_state ();
             destroy ();
         }
 
         // Graceful shutdown.
 
-        public bool quit_gracefully () {
+        public bool quit_gracefully ()
+        {
             action_quit ();
             return false;
         }

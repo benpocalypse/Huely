@@ -38,6 +38,9 @@
     <value key="x-appcenter-color-primary">#273445</value>
     <value key="x-appcenter-color-primary-text">#fafafa</value>
 
+    <value key="Purism::form_factor">workstation</value>
+    <value key="Purism::form_factor">mobile</value>
+
     <!--
       Uncomment the following two lines if you want to monetise your app.
       https://github.com/elementary/houston/wiki/Monetizing-Your-App
