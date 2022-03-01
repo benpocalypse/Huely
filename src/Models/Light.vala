@@ -269,6 +269,8 @@ public class Huely.Light : Object
             send_data (args);
         }
 
+        color = red.to_string ("%x") + green.to_string ("%x") + blue.to_string ("%x");
+
         //Populate fields
         //Color = color;
         //WarmWhite = 0;

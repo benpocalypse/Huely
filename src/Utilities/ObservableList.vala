@@ -44,6 +44,11 @@ public class Huely.ObservableList<T> : Object, ListModel {
         items_changed (0,total,0);
     }
 
+    public uint length ()
+    {
+        return data.length ();
+    }
+
   Object? get_item (uint position) {
     return this[position] as Object;
   }

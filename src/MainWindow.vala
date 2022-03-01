@@ -86,6 +86,7 @@ namespace Huely {
         private Gtk.Box contentBox;
         private Hdy.Leaflet leaf2;
         private Gtk.ScrolledWindow scrolledWindow;
+        private LightView lightView = new LightView ();
 
         private void create_layout () {
             // Unlike GTK, in Handy, the header bar is added to the window’s content area.
@@ -274,7 +275,7 @@ namespace Huely {
 
             titlebar.add(leaf1);
 
-            LightView lightView = new LightView ();
+            //lightView = new LightView ();
 
             Gtk.Button setButton = new Gtk.Button ();
             setButton.margin_right = 10;
@@ -442,13 +443,20 @@ namespace Huely {
 
             string lightName;
             string lightIp;
+            string lightColor;
             int numLights;
 
-            numLights = Huely.saved_state.get_int ("numLights");
-            lightName = Huely.saved_state.get_string ("lightName1");
-            lightIp = Huely.saved_state.get_string ("lightIp1");
+            numLights = Huely.saved_state.get_int ("num-lights");
 
-            print (@"light: $(numLights) , $(lightName), $(lightIp)\n");
+            for (int i =0; i < numLights; i++)
+            {
+                lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
+                lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
+                lightColor = Huely.saved_state.get_string (@"light-color-$(i+1)");
+                print (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
+                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { name = lightName, color = lightColor});
+                lightView.show_all ();
+            }
 
             default_width = rect.width;
             default_height = rect.height;
@@ -496,13 +504,18 @@ namespace Huely {
             get_position (out x, out y);
             Huely.saved_state.set ("window-position", "(ii)", x, y);
 
-            Huely.saved_state.set_value ("numLights", 1);
-            Huely.saved_state.set_value ("lightName1", "My Light Name");
-            Huely.saved_state.set_value ("lightIp1",  "192.168.1.1");
+            var numLights = ((int)lightView.ViewModel.Lights.length ());
+            Huely.saved_state.set ("num-lights", "i", numLights);
+
+            for (int i = 0; i < numLights; i++)
+            {
+                Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].name);
+                Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].ipAddress);
+                Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].color);
+            }
         }
 
         // Actions.
-
         private void set_up_actions ()
         {
             // Setup actions and their accelerators.

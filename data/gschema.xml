@@ -21,5 +21,91 @@
       <summary>Most recent window size</summary>
       <description>Most recent window size (width, height)</description>
     </key>
+    <key name="num-lights" type="i">
+      <default>0</default>
+      <summary>Number of lights discovered</summary>
+      <description>The saved lights that Huely has discovered</description>
+    </key>
+
+    <key name="light-name-1" type="s">
+      <default>""</default>
+      <summary>Name of light 1</summary>
+      <description>The saved name of light number 1</description>
+    </key>
+    <key name="light-ip-1" type="s">
+      <default>""</default>
+      <summary>Ip address of light 1</summary>
+      <description>The saved ip address of light number 1</description>
+    </key>
+    <key name="light-color-1" type="s">
+      <default>""</default>
+      <summary>Color of light 1</summary>
+      <description>The saved color of light number 1</description>
+    </key>
+
+    <key name="light-name-2" type="s">
+      <default>""</default>
+      <summary>Name of light 2</summary>
+      <description>The saved name of light number 2</description>
+    </key>
+    <key name="light-ip-2" type="s">
+      <default>""</default>
+      <summary>Ip address of light 2</summary>
+      <description>The saved ip address of light number 2</description>
+    </key>
+    <key name="light-color-2" type="s">
+      <default>""</default>
+      <summary>Color of light 2</summary>
+      <description>The saved color of light number 2</description>
+    </key>
+
+    <key name="light-name-3" type="s">
+      <default>""</default>
+      <summary>Name of light 3</summary>
+      <description>The saved name of light number 3</description>
+    </key>
+    <key name="light-ip-3" type="s">
+      <default>""</default>
+      <summary>Ip address of light 3</summary>
+      <description>The saved ip address of light number 3</description>
+    </key>
+    <key name="light-color-3" type="s">
+      <default>""</default>
+      <summary>Color of light 3</summary>
+      <description>The saved color of light number 3</description>
+    </key>
+
+    <key name="light-name-4" type="s">
+      <default>""</default>
+      <summary>Name of light 4</summary>
+      <description>The saved name of light number 4</description>
+    </key>
+    <key name="light-ip-4" type="s">
+      <default>""</default>
+      <summary>Ip address of light 4</summary>
+      <description>The saved ip address of light number 4</description>
+    </key>
+    <key name="light-color-4" type="s">
+      <default>""</default>
+      <summary>Color of light 4</summary>
+      <description>The saved color of light number 4</description>
+    </key>
+
+    <key name="light-name-5" type="s">
+      <default>""</default>
+      <summary>Name of light 5</summary>
+      <description>The saved name of light number 5</description>
+    </key>
+    <key name="light-ip-5" type="s">
+      <default>""</default>
+      <summary>Ip address of light 5</summary>
+      <description>The saved ip address of light number 5</description>
+    </key>
+    <key name="light-color-5" type="s">
+      <default>""</default>
+      <summary>Color of light 5</summary>
+      <description>The saved color of light number 5</description>
+    </key>
+
   </schema>
 </schemalist>
