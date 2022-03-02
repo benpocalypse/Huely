@@ -1,13 +1,14 @@
 public class Huely.Light : Object
 {
+    // TODO - Evaluate get/set public/private concerns.
     public string Name { get; set; }
     public string IpAddress { get; set; }
     public string Color { get; set; }
     public bool IsOn { get; set; }
     public bool IsConnected { get; set; }
 
-    private bool _useChecksum { get; set; }
-    private LedProtocol _protocol { get; private set; }
+    private bool _useChecksum;
+    private LedProtocol _protocol;
 
     private uint8 brightness { get; private set; }
     private DateTime time { get; private set; }
