@@ -7,7 +7,8 @@ public class Huely.LightDiscovery : GLib.Object
 
         // Hold reference to closure to keep it from being freed whilst
         // thread is active.
-        ThreadFunc<bool> run = () => {
+        ThreadFunc<bool> run = () =>
+        {
             GLib.Socket sock;
 
             string discoveryMessage = "HF-A11ASSISTHREAD";

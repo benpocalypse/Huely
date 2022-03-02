@@ -44,6 +44,7 @@ public class Huely.Light : Object
     private GLib.Socket _socket;
     private const uint16 PORT = 5577;
 
+/*
     public Light ()
     {
         isConnected = false;
@@ -53,6 +54,7 @@ public class Huely.Light : Object
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
         this.Connect ();
     }
+*/
 
     public Light.with_ip (string ip)
     {
@@ -62,10 +64,19 @@ public class Huely.Light : Object
         ipAddress = ip;
 
         _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
-        this.Connect ();
+
+        var loop = new MainLoop();
+        this.ConnectAsync.begin((obj, res) =>
+        {
+            this.ConnectAsync.end (res);
+            loop.quit();
+        });
+        loop.run();
     }
 
     // Communications functions
+
+    /*
     public void Connect ()
     {
         var addr = new InetAddress.from_string (ipAddress);
@@ -85,7 +96,53 @@ public class Huely.Light : Object
             print (@"Failed to connect to light: $msg\n");
         }
     }
+    */
 
+    public async void ConnectAsync ()
+    {
+        print ("ConnectAsync ()\n");
+        SourceFunc callback = ConnectAsync.callback;
+
+        var addr = new InetAddress.from_string (ipAddress);
+        var address = new InetSocketAddress(addr, PORT);
+
+        ThreadFunc<bool> run = () =>
+        {
+            try
+            {
+                //_socket.set_timeout (1);
+                isConnected = _socket.connect (address);
+                print (@"Connected = $isConnected\n");
+
+                var loop = new MainLoop();
+                GetProtocolAsync.begin((obj, res) =>
+                {
+                    GetProtocolAsync.end (res);
+                    loop.quit();
+                });
+                loop.run();
+
+                loop = new MainLoop();
+                RefreshAsync.begin((obj, res) =>
+                {
+                    RefreshAsync.end (res);
+                    loop.quit();
+                });
+                loop.run();
+            }
+            catch (GLib.Error error)
+            {
+                var msg = error.message;
+                print (@"Failed to connect to light: $msg\n");
+            }
+
+            Idle.add((owned) callback);
+            return true;
+        };
+        new Thread<bool>("light-connect-thread", run);
+
+        yield;
+    }
 
     private LedProtocol GetProtocol ()
     {
@@ -125,21 +182,67 @@ public class Huely.Light : Object
         return result;
     }
 
+    private async LedProtocol GetProtocolAsync ()
+    {
+        SourceFunc callback = GetProtocolAsync.callback;
+        LedProtocol result = LedProtocol.UNKNOWN;
+
+        ThreadFunc<bool> run = () =>
+        {
+            print ("GetProtocolAsync ()\n");
+            uint8[] args = {0x81, 0x8a, 0x8b};
+            send_data (args);
+            try
+            {
+                uint8[] buffer_ledenet = new uint8[14];
+                GLib.Cancellable cancel = new GLib.Cancellable ();
+                _socket.receive (buffer_ledenet, cancel);
+                result = LedProtocol.LEDENET;
+            }
+            catch (GLib.Error error)
+            {
+                var msg = error.message;
+                print (@"Error, not LEDENET due to: $msg\n");
+                args = {0xef, 0x01, 0x77};
+                send_data(args);
+                try
+                {
+                    uint8[] buffer_original = new uint8[14];
+                    _socket.receive (buffer_original);
+                    result = LedProtocol.LEDENET_ORIGINAL;
+                }
+                catch (GLib.Error error)
+                {
+                    msg = error.message;
+                    print (@"Error, not LEDENET_ORIGINAL due to: $msg\n");
+                    result = LedProtocol.UNKNOWN;
+                }
+            }
+
+            protocol = result;
+
+            Idle.add((owned) callback);
+            return true;
+        };
+        new Thread<bool>("light-get-protocol-thread", run);
+
+        yield;
+        return result;
+    }
+
     public void Refresh ()
     {
         print ("Refresh ()\n");
         //Send request for status.
         if (protocol == LedProtocol.LEDENET)
         {
-            uint8[] args = {0x81, 0x8a, 0x8b};
-            send_data (args);
+            send_data ({0x81, 0x8a, 0x8b});
         }
         else
         {
             if (protocol == LedProtocol.LEDENET_ORIGINAL)
             {
-                uint8[] args = {0xef, 0x01, 0x77};
-                send_data (args);
+                send_data ({0xef, 0x01, 0x77});
             }
         }
 
@@ -205,6 +308,68 @@ public class Huely.Light : Object
         */
     }
 
+    public async void RefreshAsync ()
+    {
+        SourceFunc callback = RefreshAsync.callback;
+        print ("RefreshAsync ()\n");
+
+        ThreadFunc<bool> run = () =>
+        {
+            //Send request for status.
+            if (protocol == LedProtocol.LEDENET)
+            {
+                uint8[] args = {0x81, 0x8a, 0x8b};
+                send_data (args);
+            }
+            else
+            {
+                if (protocol == LedProtocol.LEDENET_ORIGINAL)
+                {
+                    uint8[] args = {0xef, 0x01, 0x77};
+                    send_data (args);
+                }
+            }
+
+            var dataRaw = read_data ();
+            string[] dataHex = new string[14];
+
+            // TODO - Why even bother to convert it to hex strings?
+            print ("dataHex = ");
+            for (int i = 0; i < dataHex.length; i++)
+            {
+                dataHex[i] = dataRaw[i].to_string ("%x");
+                print (dataHex[i] +", ");
+            }
+            print ("\n");
+
+            // TODO - convert this to not use string hex
+            if (protocol == LedProtocol.LEDENET_ORIGINAL && dataHex[1] == "01")
+            {
+                useChecksum = false;
+            }
+
+            //Check power state.
+            if (dataRaw[2] == 35)
+            {
+                print (@"Light.isOn = $isOn\n");
+                isOn = true;
+                print (@"Light.isOn = $isOn\n");
+            }
+            else if (dataRaw[2] == 36)
+            {
+                print (@"Light.isOn = $isOn\n");
+                isOn = false;
+                print (@"Light.isOn = $isOn\n");
+            }
+
+            Idle.add((owned) callback);
+            return true;
+        };
+        new Thread<bool>("light-refresh-thread", run);
+
+        yield;
+    }
+
     public void set_state (bool turnOn)
     {
         if (turnOn == true)
@@ -249,12 +414,17 @@ public class Huely.Light : Object
         isOn = false;
     }
 
-    public void set_color2(uint8 red, uint8 green, uint8 blue)
+    public void set_color2 (uint8 red, uint8 green, uint8 blue)
     {
-        // FIXME - is this because we actually have 2 instances of this class? One in our ObservableList, and one in our LightListBoxRow?
         if (isConnected == false)
         {
-            Connect ();
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
         }
 
         if (protocol == LedProtocol.LEDENET)

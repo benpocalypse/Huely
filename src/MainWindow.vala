@@ -293,8 +293,18 @@ namespace Huely {
                     uint8 green = ((uint8)(rgba.green * 255));
                     uint8 blue = ((uint8)(rgba.blue * 255));
 
+                    // TODO - See if the disdplay name can be bound to the actual light name.
                     row.set_name (nameEntry.text);
-                    row.light.Connect ();
+
+                    var loop = new MainLoop();
+                    row.light.ConnectAsync.begin((obj, res) =>
+                    {
+                        row.light.ConnectAsync.end (res);
+                        loop.quit();
+                    });
+                    loop.run();
+
+                    row.light.name = nameEntry.text;
                     row.light.set_color2 (red, green, blue);
                 }
             });
@@ -349,6 +359,7 @@ namespace Huely {
 
                 LightDiscovery dl = new LightDiscovery ();
                 ObservableList<Huely.Light> lights = new ObservableList<Huely.Light> ();
+
                 var loop = new MainLoop();
                 dl.DiscoverLightsAsync.begin((obj, res) =>
                 {
