@@ -75,6 +75,9 @@ echo -e "• Backing up text scaling factor."
 # Back up the current text scaling factor so we can restore it at the end.
 initial_text_scaling_factor=$(gsettings get org.gnome.desktop.interface text-scaling-factor)
 
+# Back up the current color preference.
+initial_color_preference=$(busctl get-property org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 io.elementary.pantheon.AccountsService PrefersColorScheme)
+
 # Get list of localisation languages from app data.
 languages=("en")
 
@@ -123,8 +126,8 @@ for language in ${languages[*]}; do
 
     echo -e "          » Launching app."
 
-    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.benpocalypse.Huely &
-    sleep 1
+    LANGUAGE="${languages_to_full_language_codes[$language]}" flatpak run com.github.benpocalypse.Huely &
+    sleep 5
     xdotool search --onlyvisible --class Huely windowactivate
 
     echo -e "          » Taking screenshot."
@@ -147,8 +150,8 @@ for language in ${languages[*]}; do
 
     echo -e "          » Launching app."
 
-    LANGUAGE="${languages_to_full_language_codes[$language]}" build/com.github.benpocalypse.Huely &
-    sleep 1
+    LANGUAGE="${languages_to_full_language_codes[$language]}" flatpak run com.github.benpocalypse.Huely &
+    sleep 5
     xdotool search --onlyvisible --class Huely windowactivate
 
     echo -e "          » Taking screenshot."
@@ -182,5 +185,9 @@ done;
 echo -e "\n• Restoring initial text scaling factor."
 
 gsettings set org.gnome.desktop.interface text-scaling-factor "${initial_text_scaling_factor}"
+
+echo -e "\n* Resetoring initial color preference."
+
+busctl set-property org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 io.elementary.pantheon.AccountsService PrefersColorScheme ${initial_color_preference}
 
 echo -e "\nDone!\n\nYou can find the screenshots in the screenshots folder."
