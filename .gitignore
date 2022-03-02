@@ -1,6 +1,8 @@
+_build/
 build/
 builddir/
 .flatpak-builder/
+.vscode/
 
 # temp files created by elementary OS code
 *~
