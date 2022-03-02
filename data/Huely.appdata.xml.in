@@ -3,6 +3,7 @@
 <component type="desktop">
   <id>com.github.benpocalypse.Huely</id>
   <metadata_license>CC0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
   <!--
     To update the content rating data of your app, you can
     use the Open Age Ratings Service tool at

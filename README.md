@@ -6,6 +6,8 @@ Control WiFi lights using this simple app.
 
 [![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.benpocalypse.Huely])
 
+![Huely screensot](./screenshots/en/light-and-dark.png)
+
 ## System requirements
 
   - [elementary OS](https://elementary.io) 6 (Odin)
