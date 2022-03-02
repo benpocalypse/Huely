@@ -4,9 +4,9 @@
 
 Control WiFi lights using this simple app.
 
-[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.benpocalypse.Huely])
+![Huely screenshot](./screenshots/en/light-and-dark.png)
 
-![Huely screensot](./screenshots/en/light-and-dark.png)
+[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.benpocalypse.Huely])
 
 ## System requirements
 
