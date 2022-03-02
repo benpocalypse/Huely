@@ -13,7 +13,7 @@ public class Huely.LightDiscovery : GLib.Object
 
             string discoveryMessage = "HF-A11ASSISTHREAD";
             var cancel = new GLib.Cancellable ();
-            string receiveBuffer = "extra long string to store data in hopefully";
+            string receiveBuffer = "                                            ";
 
             try
             {
