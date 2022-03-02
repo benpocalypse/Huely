@@ -94,22 +94,6 @@ task/take-screenshots
 
 > You must push the generated screenshots folder to your GitHub repository before the screenshot will appear when you preview your app in AppCenter.
 
-#### Publish
-
-There is a simple web site for Huely in the _docs/_ folder.
-
-If GitHub pages is enabled for the app, you can view the site at https://benpocalypse.github.io/Huely
-
-The site has an Install button that links to the Flatpak repository. People can use this button to sideload the app directly from its website.
-
-To publish this Flatpak repository, use this task:
-
-```shell
-task/publish
-```
-
-> You must push the generated Flatpak repository to your GitHub repository and enable GitHub pages (or host it elsewhere – e.g., using [Site.js](https://sitejs.org)) before people will be able install your app.
-
 #### Preview in AppCenter
 
 Launches app locally in AppCenter so you can preview how it will look when published.
