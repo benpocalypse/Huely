@@ -38,9 +38,14 @@ public class Huely.ColorChooser : Gtk.Grid
 
             colorButton.clicked.connect ((btn) =>
             {
-                SelectedColor = ((Huely.ColorGridButton)btn).Color;
-                handlePreviousButtonClick();
-                handleClick((Huely.ColorGridButton)btn);
+                var huelyButton = ((Huely.ColorGridButton)btn);
+
+                if (SelectedColor != huelyButton.Color)
+                {
+                    SelectedColor = huelyButton.Color;
+                    handlePreviousButtonClick ();
+                    handleClick ((Huely.ColorGridButton)btn);
+                }
             });
 
             this.attach (colorButton, x, y);
@@ -61,13 +66,9 @@ public class Huely.ColorChooser : Gtk.Grid
     {
         if (_previouslyClickedButton != null)
         {
-            int tempCol;
-            int tempRow;
-            Gdk.RGBA tempColor;
-
-            tempRow = _previouslyClickedButton.Row;
-            tempCol = _previouslyClickedButton.Column;
-            tempColor = _previouslyClickedButton.Color;
+            var tempRow = _previouslyClickedButton.Row;
+            var tempCol = _previouslyClickedButton.Column;
+            var tempColor = _previouslyClickedButton.Color;
 
             this.remove (_previouslyClickedButton);
 
@@ -75,8 +76,14 @@ public class Huely.ColorChooser : Gtk.Grid
 
             _previouslyClickedButton.clicked.connect ((btn) =>
             {
-                handlePreviousButtonClick();
-                handleClick ((Huely.ColorGridButton)btn);
+                var huelyButton = ((Huely.ColorGridButton)btn);
+
+                if (huelyButton.Color != SelectedColor)
+                {
+
+                    handlePreviousButtonClick ();
+                    handleClick ((Huely.ColorGridButton)btn);
+                }
             });
 
             _previouslyClickedButton.height_request = 25;
@@ -91,13 +98,9 @@ public class Huely.ColorChooser : Gtk.Grid
 
     private void handleClick (Huely.ColorGridButton btn)
     {
-        int tempCol;
-        int tempRow;
-        Gdk.RGBA tempColor;
-
-        tempCol = btn.Column;
-        tempRow = btn.Row;
-        tempColor = btn.Color;
+        var tempCol = btn.Column;
+        var tempRow = btn.Row;
+        var tempColor = btn.Color;
 
         debug (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
 
@@ -114,8 +117,13 @@ public class Huely.ColorChooser : Gtk.Grid
 
         colorButton.clicked.connect ((btn) =>
         {
-            handlePreviousButtonClick();
-            handleClick((Huely.ColorGridButton)btn);
+            var huelyButton = ((Huely.ColorGridButton)btn);
+
+            if (huelyButton.Color != SelectedColor)
+            {
+                handlePreviousButtonClick ();
+                handleClick ((Huely.ColorGridButton)btn);
+            }
         });
 
         debug (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
