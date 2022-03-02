@@ -2,7 +2,7 @@ project(
     'com.github.benpocalypse.Huely',
     'vala',
     'c',
-    version: '0.1.0'
+    version: '0.2.0'
 )
 
 i18n = import('i18n')
@@ -35,7 +35,6 @@ executable(
     gresource,
     'src' / 'Application.vala',
     'src' / 'MainWindow.vala',
-    'src' / 'Constants' / 'Colors.vala',
     'src' / 'Models' / 'Light.vala',
     'src' / 'Utilities' / 'LightDiscovery.vala',
     'src' / 'Utilities' / 'ObservableList.vala',

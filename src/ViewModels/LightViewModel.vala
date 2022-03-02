@@ -11,7 +11,7 @@ public class Huely.LightViewModel : Object
         Lights.items_changed.connect((item) =>
         {
             this.notify_property ("Lights");
-            print ("LightViewModel.Lights notify()\n");
+            debug ("LightViewModel.Lights notify()\n");
         });
     }
 }

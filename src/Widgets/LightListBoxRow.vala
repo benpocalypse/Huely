@@ -18,7 +18,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
         if (this.light != null)
         {
             this.light.bind_property (
-                "name",
+                "Name",
                 this._lightName,
                 "label",
                 BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
@@ -30,7 +30,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
     {
         this.light = light;
 
-        _lightName  = new Gtk.Label (light.name)
+        _lightName  = new Gtk.Label (light.Name)
         {
             halign = Gtk.Align.START,
             margin_left = 12,
@@ -38,7 +38,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
             margin_right = 12
         };
 
-        _ipAddress  = new Gtk.Label (light.ipAddress)
+        _ipAddress  = new Gtk.Label (light.IpAddress)
         {
             halign = Gtk.Align.START,
             margin_left = 12,
@@ -61,7 +61,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
         colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
         colorButton.margin = 3;
         colorButton.halign = Gtk.Align.END;
-        colorButton.set_active(light.isOn);
+        colorButton.set_active(light.IsOn);
 
         colorButton.toggled.connect (() =>
         {
@@ -70,8 +70,8 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
         light.notify.connect (() =>
         {
-            print (@"LightListBoxRow.isOn = $(light.isOn)\n");
-            colorButton.set_active(light.isOn);
+            debug (@"LightListBoxRow.IsOn = $(light.IsOn)\n");
+            colorButton.set_active(light.IsOn);
         });
 
         _horizontalBox.add (_verticalBox);
@@ -79,17 +79,12 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _horizontalBox.set_child_packing (colorButton, true, true, 0, Gtk.PackType.END );
 
         add (_horizontalBox);
-
-        /*
-        Object (
-            light: light
-        );
-        */
     }
 
     public void set_name (string name)
     {
         _lightName.set_label (name);
+        light.Name = name;
     }
 
     public void set_ip_address (string ipAddress)
@@ -106,6 +101,5 @@ public class LightListBoxRow : Gtk.ListBoxRow
     public LightListBoxRow.with_ip_address (string ipAddress)
     {
         set_ip_address (ipAddress);
-        //return this;
     }
 }

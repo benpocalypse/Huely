@@ -1,5 +1,6 @@
 namespace Huely {
-    public class MainWindow : Hdy.ApplicationWindow {
+    public class MainWindow : Hdy.ApplicationWindow
+    {
         public weak Huely.Application app { get; construct; }
 
         // Widgets
@@ -10,24 +11,28 @@ namespace Huely {
         public SimpleActionGroup actions { get; set; }
         public static Gee.MultiMap<string, string> action_accelerators = new Gee.HashMultiMap<string, string> ();
 
-        public enum WindowState {
+        public enum WindowState
+        {
             NORMAL = 0,
             MAXIMIZED = 1,
             FULLSCREEN = 2
         }
 
-        private const ActionEntry[] ACTION_ENTRIES = {
+        private const ActionEntry[] ACTION_ENTRIES =
+        {
             { ACTION_FULLSCREEN, action_fullscreen },
             { ACTION_QUIT, action_quit },
         };
 
-        private static void define_action_accelerators () {
+        private static void define_action_accelerators ()
+        {
             // Define action accelerators (keyboard shortcuts).
             action_accelerators.set (ACTION_FULLSCREEN, "F11");
             action_accelerators.set (ACTION_QUIT, "<Control>q");
         }
 
-        public MainWindow (Huely.Application application) {
+        public MainWindow (Huely.Application application)
+        {
             Object (
                 // We must set the inherited application property for Hdy.ApplicationWindow
                 // to initialise properly. However, this is not a set-type property (get; set;)
@@ -40,15 +45,16 @@ namespace Huely {
                 // the constructors. Anywhere else, they can be used interchangeably.
                 app: application,
                 application: application,                    // DON’T use in constructors; won’t have been assigned yet.
-                height_request: 200,
-                width_request: 200,
+                height_request: 390,
+                width_request: 380,
                 hide_titlebar_when_maximized: true,          // FIXME: This does not seem to have an effect. Why not?
                 icon_name: "com.github.benpocalypse.Huely"
             );
         }
 
         // This constructor is guaranteed to be run only once during the lifetime of the application.
-        static construct {
+        static construct
+        {
             // Initialise the Handy library.
             // https://gnome.pages.gitlab.gnome.org/libhandy/
             // (Apps in elementary OS 6 use the Handy library extensions
@@ -60,7 +66,8 @@ namespace Huely {
         }
 
         // This constructor will be called every time an instance of this class is created.
-        construct {
+        construct
+        {
             // State preservation: save window dimensions and location on window close.
             // See: https://docs.elementary.io/hig/user-workflow/closing
             set_up_state_preservation ();
@@ -87,11 +94,10 @@ namespace Huely {
         private Hdy.Leaflet leaf2;
         private Gtk.ScrolledWindow scrolledWindow;
         private LightView lightView = new LightView ();
+        Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
 
-        private void create_layout () {
-            // Unlike GTK, in Handy, the header bar is added to the window’s content area.
-            // See https://gnome.pages.gitlab.gnome.org/libhandy/doc/1-latest/HdyHeaderBar.html
-
+        private void create_layout ()
+        {
             Hdy.TitleBar titlebar = new Hdy.TitleBar();
             Hdy.Deck deck1 = new Hdy.Deck ();
             Gtk.Box aboutBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -120,26 +126,18 @@ namespace Huely {
                 leaf2.set_visible_child (scrolledWindow);
             });
 
-            Gtk.Button settingsButton = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
+            Gtk.Button settingsButtonRight = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
+            Gtk.Button settingsButtonLeft = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
+            settingsButtonLeft.visible = false;
 
-            settingsButton.clicked.connect (() =>
+            settingsButtonRight.clicked.connect ((btn) =>
             {
-                Gtk.Box menuBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                GenerateSettingsMenuForDeck (deck1, btn);
+            });
 
-                var helpButton = new Gtk.ModelButton ();
-                helpButton.text = "Help";
-                helpButton.clicked.connect (() =>  GLib.AppInfo.launch_default_for_uri ("https://github.com/benpocalypse/Huely", new GLib.AppLaunchContext ()));
-
-                var aboutButton = new Gtk.ModelButton ();
-                aboutButton.text = "About";
-                aboutButton.clicked.connect (() => deck1.set_visible_child (aboutBox));
-
-                menuBox.pack_start (helpButton);
-                menuBox.pack_start (aboutButton);
-
-                Gtk.Popover popover = new Gtk.Popover (settingsButton);
-                popover.add (menuBox);
-                popover.show_all ();
+            settingsButtonLeft.clicked.connect ((btn) =>
+            {
+                GenerateSettingsMenuForDeck (deck1, btn);
             });
 
             Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
@@ -148,7 +146,7 @@ namespace Huely {
             headrGroup.set_decorate_all (false);
 
             // This 'ugliness' is responsible for hiding/showing the back button
-            // on the Details pane when size permits.
+            // on the Details pane, and the settings gear on both when size permits.
             headrGroup.update_decoration_layouts.connect (() =>
             {
                 var childName = leaf2.get_visible_child ().name;
@@ -168,12 +166,22 @@ namespace Huely {
                         backButton.visible = true;
                     }
                 }
+
+                if (leaf1.get_folded () == true)
+                {
+                    settingsButtonLeft.visible = true;
+                }
+                else
+                {
+                    settingsButtonLeft.visible = false;
+                }
             });
 
             Gtk.Label nameLabel = new Gtk.Label ("Name:");
             nameLabel.vexpand = false;
             nameLabel.margin = 12;
             Gtk.Entry nameEntry = new Gtk.Entry ();
+            nameEntry.set_sensitive (false);
             nameEntry.vexpand = false;
             nameEntry.margin = 5;
             nameEntry.margin_top = 10;
@@ -183,42 +191,6 @@ namespace Huely {
             nameBox.add (nameEntry);
 
             // TODO - Make a proper palette parser or something. This is ugly.
-            string [] paletteStrings1 =
-            {
-                "#ffffff",
-                "#fb6b1d",
-                "#e83b3b",
-                "#831c5d",
-                "#c32454",
-                "#f04f78",
-                "#f68181",
-                "#fca790",
-                "#e3c896",
-                "#ab947a",
-                "#966c6c",
-                "#625565",
-                "#3e3546",
-                "#0b5e65",
-                "#0b8a8f",
-                "#1ebc73",
-                "#91db69",
-                "#fbff86",
-                "#fbb954",
-                "#cd683d",
-                "#9e4539",
-                "#7a3045",
-                "#6b3e75",
-                "#905ea9",
-                "#a884f3",
-                "#eaaded",
-                "#8fd3ff",
-                "#4d9be6",
-                "#4d65b4",
-                "#484a77",
-                "#30e1b9",
-                "#8ff8e2"
-            };
-
             string [] paletteStrings =
             {
                 "#6074ab",
@@ -270,12 +242,10 @@ namespace Huely {
 
             leaf1.add (headrbar1);
             headrbar2.pack_start (backButton);
-            headrbar2.pack_end (settingsButton);
+            headrbar2.pack_end (settingsButtonRight);
             leaf1.add (headrbar2);
 
             titlebar.add(leaf1);
-
-            //lightView = new LightView ();
 
             Gtk.Button setButton = new Gtk.Button ();
             setButton.margin_right = 10;
@@ -293,9 +263,6 @@ namespace Huely {
                     uint8 green = ((uint8)(rgba.green * 255));
                     uint8 blue = ((uint8)(rgba.blue * 255));
 
-                    // TODO - See if the disdplay name can be bound to the actual light name.
-                    row.set_name (nameEntry.text);
-
                     var loop = new MainLoop();
                     row.light.ConnectAsync.begin((obj, res) =>
                     {
@@ -304,7 +271,7 @@ namespace Huely {
                     });
                     loop.run();
 
-                    row.light.name = nameEntry.text;
+                    row.set_name (nameEntry.text);
                     row.light.set_color2 (red, green, blue);
                 }
             });
@@ -318,11 +285,7 @@ namespace Huely {
                 leaf1.set_visible_child (headrbar2);
                 leaf2.set_visible_child (contentBox);
                 setButton.set_sensitive (true);
-            });
-
-            lightView.notify.connect (() =>
-            {
-               print ("MainWindow.lightView updated!\n");
+                nameEntry.set_sensitive (true);
             });
 
             contentBox.pack_start (setButton, false, false);
@@ -354,7 +317,7 @@ namespace Huely {
                 scrolledWindow.show_all ();
                 spinner.start ();
 
-                print ("Searching for lights...\n");
+                debug ("Searching for lights...\n");
                 lightView.clear ();
 
                 LightDiscovery dl = new LightDiscovery ();
@@ -368,6 +331,7 @@ namespace Huely {
                 });
                 loop.run();
 
+                lightView.clear ();
                 lightView.add_lights (lights.data);
                 lightView.show_all();
 
@@ -377,12 +341,14 @@ namespace Huely {
                 scrolledWindow.show_all ();
             });
 
-            headrbar1.add (searchButton);
+            headrbar1.pack_start (searchButton);
+            headrbar1.pack_end (settingsButtonLeft);
 
             leaf2.add (scrolledWindow);
             leaf2.add (contentBox);
             leaf2.valign = Gtk.Align.FILL;
 
+            // About Deck
             Hdy.HeaderBar aboutHeader = new Hdy.HeaderBar ();
             Gtk.Button aboutBackButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
 
@@ -425,10 +391,34 @@ namespace Huely {
             mainBox.pack_start (titlebar, false, false);
             mainBox.pack_start (leaf2, true, true);
 
-            deck1.prepend (aboutBox);
+            aboutScrolledWindow.add (aboutBox);
+            aboutScrolledWindow.valign = Gtk.Align.FILL;
+            aboutScrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+
+            deck1.prepend (aboutScrolledWindow);
             deck1.prepend (mainBox);
 
             add (deck1);
+        }
+
+        private void GenerateSettingsMenuForDeck (Hdy.Deck deck, Gtk.Button button)
+        {
+            Gtk.Box menuBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+
+            var helpButton = new Gtk.ModelButton ();
+            helpButton.text = "Help";
+            helpButton.clicked.connect (() =>  GLib.AppInfo.launch_default_for_uri ("https://github.com/benpocalypse/Huely", new GLib.AppLaunchContext ()));
+
+            var aboutButton = new Gtk.ModelButton ();
+            aboutButton.text = "About";
+            aboutButton.clicked.connect (() => deck.set_visible_child (aboutScrolledWindow));
+
+            menuBox.pack_start (helpButton);
+            menuBox.pack_start (aboutButton);
+
+            Gtk.Popover popover = new Gtk.Popover (button);
+            popover.add (menuBox);
+            popover.show_all ();
         }
 
         // State preservation.
@@ -464,8 +454,8 @@ namespace Huely {
                 lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
                 lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
                 lightColor = Huely.saved_state.get_string (@"light-color-$(i+1)");
-                print (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
-                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { name = lightName, color = lightColor});
+                debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
+                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { Name = lightName, Color = lightColor});
                 lightView.show_all ();
             }
 
@@ -520,9 +510,9 @@ namespace Huely {
 
             for (int i = 0; i < numLights; i++)
             {
-                Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].name);
-                Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].ipAddress);
-                Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].color);
+                Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].Name);
+                Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].IpAddress);
+                Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].Color);
             }
         }
 

@@ -11,7 +11,8 @@
 // which you won’t have if you add all your constants to this file. It will
 // also enable you to organise your constants more semantically.)
 
-namespace Constants.Config {
+namespace Constants.Config
+{
     public const string GETTEXT_PACKAGE = @GETTEXT_PACKAGE@;
     public const string PROJECT_NAME = @PROJECT_NAME@;
     public const string VERSION = @VERSION@;

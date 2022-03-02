@@ -1,38 +1,43 @@
-public class Huely.ObservableList<T> : Object, ListModel {
-  public List<T> data = new List<T> ();
+public class Huely.ObservableList<T> : Object, ListModel
+{
+    public List<T> data = new List<T> ();
 
-  public void add (T item) {
-    var position = data.length ();
+    public void add (T item)
+    {
+        var position = data.length ();
+        data.append (item);
+        items_changed (position, 0, 1);
+    }
 
-    data.append (item);
+    public void add_all (List<T> items)
+    {
+        var position = data.length ();
 
-    items_changed (position, 0, 1);
-  }
+        foreach (var item in items)
+        {
+            data.append (item);
+        }
 
-  public void add_all (List<T> items) {
-    var position = data.length ();
+        items_changed (position, 0, items.length ());
+    }
 
-    foreach (var item in items)
-      data.append (item);
+    public new T @get (uint index)
+    {
+        return data.nth_data (index);
+    }
 
-    items_changed (position, 0, items.length ());
-  }
+    public bool remove (T item)
+    {
+        var position = data.index (item);
 
-  public new T @get (uint index) {
-    return data.nth_data (index);
-  }
+        if (position == -1)
+            return false;
 
-  public bool remove (T item) {
-    var position = data.index (item);
+        data.remove (item);
+        items_changed (position, 1, 0);
 
-    if (position == -1)
-      return false;
-
-    data.remove (item);
-    items_changed (position, 1, 0);
-
-    return true;
-  }
+        return true;
+    }
 
     public void clear ()
     {
@@ -49,16 +54,19 @@ public class Huely.ObservableList<T> : Object, ListModel {
         return data.length ();
     }
 
-  Object? get_item (uint position) {
-    return this[position] as Object;
-  }
+    Object? get_item (uint position)
+    {
+        return this[position] as Object;
+    }
 
-  Type get_item_type () {
-    return typeof (T);
-  }
+    Type get_item_type ()
+    {
+            return typeof (T);
+    }
 
-  uint get_n_items () {
-    return data.length ();
-  }
+    uint get_n_items ()
+    {
+        return data.length ();
+    }
 }
 

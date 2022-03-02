@@ -99,7 +99,7 @@ public class Huely.ColorChooser : Gtk.Grid
         tempRow = btn.Row;
         tempColor = btn.Color;
 
-        print (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
+        debug (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
 
         this.remove (btn);
 
@@ -118,9 +118,9 @@ public class Huely.ColorChooser : Gtk.Grid
             handleClick((Huely.ColorGridButton)btn);
         });
 
-        print (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
-        this.attach (colorButton, colorButton.Column, colorButton.Row);
+        debug (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
 
+        this.attach (colorButton, colorButton.Column, colorButton.Row);
         this.show_all ();
     }
 }
