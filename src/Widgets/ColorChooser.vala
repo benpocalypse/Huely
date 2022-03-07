@@ -43,8 +43,8 @@ public class Huely.ColorChooser : Gtk.Grid
                 if (SelectedColor != huelyButton.Color)
                 {
                     SelectedColor = huelyButton.Color;
-                    handlePreviousButtonClick ();
-                    handleClick ((Huely.ColorGridButton)btn);
+                    HandlePreviousButtonClick ();
+                    HandleClick ((Huely.ColorGridButton)btn);
                 }
             });
 
@@ -62,7 +62,7 @@ public class Huely.ColorChooser : Gtk.Grid
         }
     }
 
-    private void handlePreviousButtonClick ()
+    private void HandlePreviousButtonClick ()
     {
         if (_previouslyClickedButton != null)
         {
@@ -80,9 +80,8 @@ public class Huely.ColorChooser : Gtk.Grid
 
                 if (huelyButton.Color != SelectedColor)
                 {
-
-                    handlePreviousButtonClick ();
-                    handleClick ((Huely.ColorGridButton)btn);
+                    HandlePreviousButtonClick ();
+                    HandleClick ((Huely.ColorGridButton)btn);
                 }
             });
 
@@ -96,7 +95,7 @@ public class Huely.ColorChooser : Gtk.Grid
         }
     }
 
-    private void handleClick (Huely.ColorGridButton btn)
+    private void HandleClick (Huely.ColorGridButton btn)
     {
         var tempCol = btn.Column;
         var tempRow = btn.Row;
@@ -121,8 +120,8 @@ public class Huely.ColorChooser : Gtk.Grid
 
             if (huelyButton.Color != SelectedColor)
             {
-                handlePreviousButtonClick ();
-                handleClick ((Huely.ColorGridButton)btn);
+                HandlePreviousButtonClick ();
+                HandleClick ((Huely.ColorGridButton)btn);
             }
         });
 

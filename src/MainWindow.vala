@@ -87,14 +87,8 @@ namespace Huely {
         }
 
         // Layout.
-        private Hdy.Leaflet leaf1;
-        private Hdy.HeaderBar headrbar2;
-        private Hdy.HeaderBar headrbar1;
-        private Gtk.Box contentBox;
-        private Hdy.Leaflet leaf2;
-        private Gtk.ScrolledWindow scrolledWindow;
         private LightView lightView = new LightView ();
-        Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
+        private Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
 
         private void create_layout ()
         {
@@ -103,21 +97,28 @@ namespace Huely {
             Gtk.Box aboutBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             Gtk.Box mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-            leaf1 = new Hdy.Leaflet();
+            Hdy.Leaflet leaf1 = new Hdy.Leaflet();
             leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
             leaf1.transition_type = Hdy.LeafletTransitionType.SLIDE;
             leaf1.visible = true;
 
-            headrbar1 = new Hdy.HeaderBar ();
+            Hdy.HeaderBar headrbar1 = new Hdy.HeaderBar ();
             headrbar1.set_title ("Huely");
             headrbar1.visible = true;
             headrbar1.show_close_button = true;
 
-            headrbar2 = new Hdy.HeaderBar ();
+            Hdy.HeaderBar headrbar2 = new Hdy.HeaderBar ();
             headrbar2.set_title ("Details");
             headrbar2.visible = true;
             headrbar2.hexpand = true;
             headrbar2.show_close_button = true;
+
+            Hdy.Leaflet leaf2 = new Hdy.Leaflet();
+
+            Gtk.ScrolledWindow scrolledWindow = new Gtk.ScrolledWindow (null, null);
+            scrolledWindow.valign = Gtk.Align.FILL;
+            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+            scrolledWindow.add (lightView);
 
             Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
             backButton.clicked.connect (() =>
@@ -227,7 +228,7 @@ namespace Huely {
                 "#753c6a"
             };
 
-            contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            Gtk.Box contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             contentBox.valign = Gtk.Align.FILL;
 
             Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
@@ -292,11 +293,6 @@ namespace Huely {
 
             var searchButton = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
             searchButton.margin = 5;
-
-            scrolledWindow = new Gtk.ScrolledWindow (null, null);
-            scrolledWindow.valign = Gtk.Align.FILL;
-            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
-            scrolledWindow.add (lightView);
 
             searchButton.clicked.connect (() =>
             {
