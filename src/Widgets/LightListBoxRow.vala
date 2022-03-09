@@ -1,8 +1,5 @@
 public class LightListBoxRow : Gtk.ListBoxRow
 {
-    private Gtk.Box _verticalBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-    private Gtk.Box _horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-
     public string LightName
     {
         get { return _lightName.label; }
@@ -44,8 +41,12 @@ public class LightListBoxRow : Gtk.ListBoxRow
             margin_left = 12,
             margin_top = 5,
             margin_right = 12,
-            margin_bottom = 5
+            margin_bottom = 3
         };
+
+        Gtk.Box _verticalBoxInner = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        Gtk.Box _verticalBoxOuter = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        Gtk.Box _horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
         Gtk.StyleContext context = new Gtk.StyleContext ();
         Pango.FontDescription font = context.get_font (Gtk.StateFlags.NORMAL);
@@ -53,8 +54,18 @@ public class LightListBoxRow : Gtk.ListBoxRow
         font.set_style (Pango.Style.ITALIC);
         _ipAddress.override_font (font);
 
-        _verticalBox.add (_lightName);
-        _verticalBox.add (_ipAddress);
+        _verticalBoxInner.add (_lightName);
+        _verticalBoxInner.add (_ipAddress);
+
+        Gtk.Scale brightnessScale = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 100, 1);
+        brightnessScale.margin_left = 10;
+        brightnessScale.margin_right = 10;
+        brightnessScale.set_draw_value (false);
+
+        brightnessScale.value_changed.connect ((val) =>
+        {
+            light.SetBrightness (val.get_value ());
+        });
 
         var colorButton = new Gtk.CheckButton ();
         var colorButtonStyle = colorButton.get_style_context ();
@@ -74,11 +85,14 @@ public class LightListBoxRow : Gtk.ListBoxRow
             colorButton.set_active(light.IsOn);
         });
 
-        _horizontalBox.add (_verticalBox);
+        _horizontalBox.add (_verticalBoxInner);
         _horizontalBox.add (colorButton);
         _horizontalBox.set_child_packing (colorButton, true, true, 0, Gtk.PackType.END );
 
-        add (_horizontalBox);
+        _verticalBoxOuter.add (_horizontalBox);
+        _verticalBoxOuter.add (brightnessScale);
+
+        add (_verticalBoxOuter);
     }
 
     public void set_name (string name)

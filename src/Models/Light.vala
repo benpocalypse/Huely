@@ -3,46 +3,18 @@ public class Huely.Light : Object
     // TODO - Evaluate get/set public/private concerns.
     public string Name { get; set; }
     public string IpAddress { get; set; }
-    public string Color { get; set; }
     public bool IsOn { get; set; }
     public bool IsConnected { get; set; }
+    public uint8 Red { get; private set; }
+    public uint8 Green { get; private set; }
+    public uint8 Blue { get; private set; }
+    public uint8 Brightness { get; private set; }
 
     private bool _useChecksum;
     private LedProtocol _protocol;
 
-    private uint8 brightness { get; private set; }
     private DateTime time { get; private set; }
-
-    private enum TransitionType { Gradual = 0x3a, Strobe = 0x3c, Jump = 0x3b }
     private enum LedProtocol { LEDENET, LEDENET_ORIGINAL, UNKNOWN }
-    private enum LightMode { Color, WarmWhite, Preset, Custom, Unknown }
-    private enum PresetPattern
-    {
-        SevenColorsCrossFade = 0x25,
-        RedGradualChange = 0x26,
-        GreenGradualChange = 0x27,
-        BlueGradualChange = 0x28,
-        YellowGradualChange = 0x29,
-        CyanGradualChange = 0x2a,
-        PurpleGradualChange = 0x2b,
-        WhiteGradualChange = 0x2c,
-        RedGreenCrossFade = 0x2d,
-        RedBlueCrossFade = 0x2e,
-        GreenBlueCrossFade = 0x2f,
-        SevenColorStrobeFlash = 0x30,
-        RedStrobeFlash = 0x31,
-        GreenStrobeFlash = 0x32,
-        BlueStrobeFlash = 0x33,
-        YellowStrobeFlash = 0x34,
-        CyanStrobeFlash = 0x35,
-        PurpleStrobeFlash = 0x36,
-        WhiteStrobeFlash = 0x37,
-        SevenColorsJumping = 0x38
-    }
-
-    // TODO - Decide if I want to keep/implement these.
-    private uint8 WarmWhite { get; private set; }
-    private LightMode Mode { get; private set; }
 
     private GLib.Socket _socket;
     private const uint16 PORT = 5577;
@@ -219,6 +191,14 @@ public class Huely.Light : Object
                 debug (@"Light.isOn = $IsOn\n");
             }
 
+            // Check color.
+            Red = dataRaw[6];
+            Green = dataRaw[7];
+            Blue = dataRaw[8];
+
+            // Update brightness.
+            UpdateBrightness();
+
             Idle.add((owned) callback);
             return true;
         };
@@ -227,33 +207,22 @@ public class Huely.Light : Object
         yield;
 
         /*
-        //Check light mode.
-        Mode = Utilis.DetermineMode(dataHex[3], dataHex[9]);
-
-        //Handle color property.
-        switch (Mode)
-        {
-            case LightMode.Color:
-                Color = new Color(dataRaw[6], dataRaw[7], dataRaw[8]);
-                WarmWhite = 0;
-                break;
-            case LightMode.WarmWhite:
-                Color = Colors.Empty;
-                WarmWhite = dataRaw[9];
-                break;
-            case LightMode.Preset:
-            case LightMode.Unknown:
-            case LightMode.Custom:
-                Color = Colors.Empty;
-                WarmWhite = 0;
-                break;
-        }
-
-        UpdateBrightness();
-
         //Send request to get the time of the light.
         Time = await GetTimeAsync();
         */
+    }
+
+    private void UpdateBrightness ()
+    {
+        int max = 0;
+
+        if (Red > max) max = Red;
+        if (Green > max) max = Green;
+        if (Blue > max) max = Blue;
+
+        max = max * 100 / 255;
+
+        Brightness = ((uint8)max);
     }
 
     public void set_state (bool turnOn)
@@ -298,7 +267,7 @@ public class Huely.Light : Object
         IsOn = false;
     }
 
-    public void set_color2 (uint8 red, uint8 green, uint8 blue)
+    public void SetColor (uint8 red, uint8 green, uint8 blue)
     {
         if (IsConnected == false)
         {
@@ -323,14 +292,24 @@ public class Huely.Light : Object
             send_data (args);
         }
 
-        Color = red.to_string ("%x") + green.to_string ("%x") + blue.to_string ("%x");
-
-        //Populate fields
-        //Color = color;
-        //WarmWhite = 0;
-        //UpdateBrightness();
+        UpdateBrightness();
     }
 
+    public void SetBrightness (double brightness)
+    {
+        if (brightness > 100)
+        {
+            brightness = 100;
+        }
+
+        var redBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Blue) ) );
+
+        SetColor (redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor);
+
+        Brightness = (uint8)brightness;
+    }
 
     public DateTime get_time2 ()
     {

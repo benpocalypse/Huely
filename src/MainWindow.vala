@@ -273,7 +273,7 @@ namespace Huely {
                     loop.run();
 
                     row.set_name (nameEntry.text);
-                    row.light.set_color2 (red, green, blue);
+                    row.light.SetColor (red, green, blue);
                 }
             });
 
@@ -451,7 +451,7 @@ namespace Huely {
                 lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
                 lightColor = Huely.saved_state.get_string (@"light-color-$(i+1)");
                 debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
-                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { Name = lightName, Color = lightColor});
+                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { Name = lightName }); //, Color = lightColor });
                 lightView.show_all ();
             }
 
@@ -508,7 +508,7 @@ namespace Huely {
             {
                 Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].Name);
                 Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].IpAddress);
-                Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].Color);
+                //Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].Color);
             }
         }
 
