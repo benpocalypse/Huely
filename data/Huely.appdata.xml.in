@@ -49,4 +49,8 @@
       </description>
     </release>
   </releases>
+
+  <developer_name>Ben Foote</developer_name>
+  <url type="homepage">https://github.com/benpocalypse/Huely</url>
+  <url type="bugtracker">https://github.com/benpocalypse/Huely/issues</url>
 </component>

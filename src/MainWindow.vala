@@ -77,7 +77,7 @@ namespace Huely {
             restore_window_state ();
 
             // Create window layout.
-            create_layout ();
+            CreateInitialLayout ();
 
             // Set up actions (with accelerators) for full screen, quit, etc.
             set_up_actions ();
@@ -89,311 +89,348 @@ namespace Huely {
         // Layout.
         private LightView lightView = new LightView ();
         private Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
+        private Gtk.Box initialBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-        private void create_layout ()
+        private void CreateInitialLayout ()
         {
-            Hdy.TitleBar titlebar = new Hdy.TitleBar();
-            Hdy.Deck deck1 = new Hdy.Deck ();
-            Gtk.Box aboutBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            Gtk.Box mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            initialBox.valign = Gtk.Align.CENTER;
+            Gtk.Image img = new Gtk.Image.from_icon_name ("com.github.benpocalypse.Huely", Gtk.IconSize.DIALOG);
 
-            Hdy.Leaflet leaf1 = new Hdy.Leaflet();
-            leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
-            leaf1.transition_type = Hdy.LeafletTransitionType.SLIDE;
-            leaf1.visible = true;
+            Gtk.Spinner spinner = new Gtk.Spinner ();
+            spinner.margin = 10;
+            spinner.width_request = 32;
+            spinner.height_request = 32;
+            spinner.start ();
 
-            Hdy.HeaderBar headrbar1 = new Hdy.HeaderBar ();
-            headrbar1.set_title ("Huely");
-            headrbar1.visible = true;
-            headrbar1.show_close_button = true;
+            initialBox.add (img);
+            initialBox.add (spinner);
 
-            Hdy.HeaderBar headrbar2 = new Hdy.HeaderBar ();
-            headrbar2.set_title ("Details");
-            headrbar2.visible = true;
-            headrbar2.hexpand = true;
-            headrbar2.show_close_button = true;
+            add (initialBox);
 
-            Hdy.Leaflet leaf2 = new Hdy.Leaflet();
-
-            Gtk.ScrolledWindow scrolledWindow = new Gtk.ScrolledWindow (null, null);
-            scrolledWindow.valign = Gtk.Align.FILL;
-            scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
-            scrolledWindow.add (lightView);
-
-            Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
-            backButton.clicked.connect (() =>
+            var createLayoutLoop = new MainLoop();
+            CreateRealLayoutAsync.begin((obj, res) =>
             {
-                leaf1.set_visible_child (headrbar1);
-                leaf2.set_visible_child (scrolledWindow);
+                CreateRealLayoutAsync.end (res);
+                createLayoutLoop.quit();
             });
+            createLayoutLoop.run();
+        }
 
-            Gtk.Button settingsButtonRight = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
-            Gtk.Button settingsButtonLeft = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
-            settingsButtonLeft.visible = false;
-
-            settingsButtonRight.clicked.connect ((btn) =>
+        private Hdy.Deck deck1 = new Hdy.Deck ();
+        private async void CreateRealLayoutAsync ()
+        {
+            SourceFunc callback = CreateRealLayoutAsync.callback;
+            ThreadFunc<bool> run = () =>
             {
-                GenerateSettingsMenuForDeck (deck1, btn);
-            });
+                Hdy.TitleBar titlebar = new Hdy.TitleBar();
+                Gtk.Box aboutBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                Gtk.Box mainBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
-            settingsButtonLeft.clicked.connect ((btn) =>
-            {
-                GenerateSettingsMenuForDeck (deck1, btn);
-            });
+                Hdy.Leaflet leaf1 = new Hdy.Leaflet();
+                leaf1.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
+                leaf1.transition_type = Hdy.LeafletTransitionType.SLIDE;
+                leaf1.visible = true;
 
-            Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
-            headrGroup.add_header_bar (headrbar1);
-            headrGroup.add_header_bar (headrbar2);
-            headrGroup.set_decorate_all (false);
+                Hdy.HeaderBar headrbar1 = new Hdy.HeaderBar ();
+                headrbar1.set_title ("Huely");
+                headrbar1.visible = true;
+                headrbar1.show_close_button = true;
 
-            // This 'ugliness' is responsible for hiding/showing the back button
-            // on the Details pane, and the settings gear on both when size permits.
-            headrGroup.update_decoration_layouts.connect (() =>
-            {
-                var childName = leaf2.get_visible_child ().name;
+                Hdy.HeaderBar headrbar2 = new Hdy.HeaderBar ();
+                headrbar2.set_title ("Details");
+                headrbar2.visible = true;
+                headrbar2.hexpand = true;
+                headrbar2.show_close_button = true;
 
-                if (childName == "GtkScrolledWindow")
+                Hdy.Leaflet leaf2 = new Hdy.Leaflet();
+
+                Gtk.ScrolledWindow scrolledWindow = new Gtk.ScrolledWindow (null, null);
+                scrolledWindow.valign = Gtk.Align.FILL;
+                scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+                scrolledWindow.add (lightView);
+
+                Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
+                backButton.clicked.connect (() =>
                 {
-                    backButton.visible = false;
-                }
-                else
+                    leaf1.set_visible_child (headrbar1);
+                    leaf2.set_visible_child (scrolledWindow);
+                });
+
+                Gtk.Button settingsButtonRight = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
+                Gtk.Button settingsButtonLeft = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
+                settingsButtonLeft.visible = false;
+
+                settingsButtonRight.clicked.connect ((btn) =>
                 {
-                    if (childName == "GtkBox" && backButton.visible == true)
+                    GenerateSettingsMenuForDeck (deck1, btn);
+                });
+
+                settingsButtonLeft.clicked.connect ((btn) =>
+                {
+                    GenerateSettingsMenuForDeck (deck1, btn);
+                });
+
+                Hdy.HeaderGroup headrGroup = new Hdy.HeaderGroup ();
+                headrGroup.add_header_bar (headrbar1);
+                headrGroup.add_header_bar (headrbar2);
+                headrGroup.set_decorate_all (false);
+
+                // This 'ugliness' is responsible for hiding/showing the back button
+                // on the Details pane, and the settings gear on both when size permits.
+                headrGroup.update_decoration_layouts.connect (() =>
+                {
+                    var childName = leaf2.get_visible_child ().name;
+
+                    if (childName == "GtkScrolledWindow")
                     {
                         backButton.visible = false;
                     }
                     else
                     {
-                        backButton.visible = true;
+                        if (childName == "GtkBox" && backButton.visible == true)
+                        {
+                            backButton.visible = false;
+                        }
+                        else
+                        {
+                            backButton.visible = true;
+                        }
                     }
-                }
 
-                if (leaf1.get_folded () == true)
+                    if (leaf1.get_folded () == true)
+                    {
+                        settingsButtonLeft.visible = true;
+                    }
+                    else
+                    {
+                        settingsButtonLeft.visible = false;
+                    }
+                });
+
+                Gtk.Label nameLabel = new Gtk.Label ("Name:");
+                nameLabel.vexpand = false;
+                nameLabel.margin = 12;
+                Gtk.Entry nameEntry = new Gtk.Entry ();
+                nameEntry.set_sensitive (false);
+                nameEntry.vexpand = false;
+                nameEntry.margin = 5;
+                nameEntry.margin_top = 10;
+                Gtk.Box nameBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+                nameBox.vexpand = false;
+                nameBox.add (nameLabel);
+                nameBox.add (nameEntry);
+
+                // TODO - Make a proper palette parser or something. This is ugly.
+                string [] paletteStrings =
                 {
-                    settingsButtonLeft.visible = true;
-                }
-                else
+                    "#6074ab",
+                    "#6b9acf",
+                    "#8bbde6",
+                    "#aae0f3",
+                    "#c8eded",
+                    "#faffe0",
+                    "#dde6e0",
+                    "#b4bec2",
+                    "#949da8",
+                    "#7a7a99",
+                    "#5b5280",
+                    "#4e3161",
+                    "#421e42",
+                    "#612447",
+                    "#7a3757",
+                    "#96485b",
+                    "#bd6868",
+                    "#d18b79",
+                    "#dbac8c",
+                    "#e6cfa1",
+                    "#e7ebbc",
+                    "#b2dba0",
+                    "#87c293",
+                    "#70a18f",
+                    "#637c8f",
+                    "#b56e75",
+                    "#c98f8f",
+                    "#dfb6ae",
+                    "#edd5ca",
+                    "#bd7182",
+                    "#9e5476",
+                    "#753c6a"
+                };
+
+                Gtk.Box contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                contentBox.valign = Gtk.Align.FILL;
+
+                Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
+                chooser.margin = 10;
+
+                contentBox.pack_start (nameBox, false, false);
+                contentBox.pack_start (chooser, false, false);
+
+                leaf2 = new Hdy.Leaflet ();
+                leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
+                leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
+
+                leaf1.add (headrbar1);
+                headrbar2.pack_start (backButton);
+                headrbar2.pack_end (settingsButtonRight);
+                leaf1.add (headrbar2);
+
+                titlebar.add(leaf1);
+
+                Gtk.Button setButton = new Gtk.Button ();
+                setButton.margin_right = 10;
+                setButton.margin_bottom = 10;
+                setButton.halign = Gtk.Align.END;
+                setButton.label = "Set";
+                setButton.clicked.connect (() =>
                 {
-                    settingsButtonLeft.visible = false;
-                }
-            });
+                    if (lightView.get_selected_row () != null)
+                    {
+                        var row = ((LightListBoxRow)lightView.get_selected_row ());
 
-            Gtk.Label nameLabel = new Gtk.Label ("Name:");
-            nameLabel.vexpand = false;
-            nameLabel.margin = 12;
-            Gtk.Entry nameEntry = new Gtk.Entry ();
-            nameEntry.set_sensitive (false);
-            nameEntry.vexpand = false;
-            nameEntry.margin = 5;
-            nameEntry.margin_top = 10;
-            Gtk.Box nameBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            nameBox.vexpand = false;
-            nameBox.add (nameLabel);
-            nameBox.add (nameEntry);
+                        var rgba = chooser.SelectedColor;
+                        uint8 red = ((uint8)(rgba.red * 255));
+                        uint8 green = ((uint8)(rgba.green * 255));
+                        uint8 blue = ((uint8)(rgba.blue * 255));
 
-            // TODO - Make a proper palette parser or something. This is ugly.
-            string [] paletteStrings =
-            {
-                "#6074ab",
-                "#6b9acf",
-                "#8bbde6",
-                "#aae0f3",
-                "#c8eded",
-                "#faffe0",
-                "#dde6e0",
-                "#b4bec2",
-                "#949da8",
-                "#7a7a99",
-                "#5b5280",
-                "#4e3161",
-                "#421e42",
-                "#612447",
-                "#7a3757",
-                "#96485b",
-                "#bd6868",
-                "#d18b79",
-                "#dbac8c",
-                "#e6cfa1",
-                "#e7ebbc",
-                "#b2dba0",
-                "#87c293",
-                "#70a18f",
-                "#637c8f",
-                "#b56e75",
-                "#c98f8f",
-                "#dfb6ae",
-                "#edd5ca",
-                "#bd7182",
-                "#9e5476",
-                "#753c6a"
-            };
+                        var loop = new MainLoop();
+                        row.light.ConnectAsync.begin((obj, res) =>
+                        {
+                            row.light.ConnectAsync.end (res);
+                            loop.quit();
+                        });
+                        loop.run();
 
-            Gtk.Box contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-            contentBox.valign = Gtk.Align.FILL;
+                        row.set_name (nameEntry.text);
+                        row.light.SetColor (red, green, blue);
+                    }
+                });
 
-            Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
-            chooser.margin = 10;
+                setButton.set_sensitive (false);
 
-            contentBox.pack_start (nameBox, false, false);
-            contentBox.pack_start (chooser, false, false);
-
-            leaf2 = new Hdy.Leaflet ();
-            leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
-            leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
-
-            leaf1.add (headrbar1);
-            headrbar2.pack_start (backButton);
-            headrbar2.pack_end (settingsButtonRight);
-            leaf1.add (headrbar2);
-
-            titlebar.add(leaf1);
-
-            Gtk.Button setButton = new Gtk.Button ();
-            setButton.margin_right = 10;
-            setButton.margin_bottom = 10;
-            setButton.halign = Gtk.Align.END;
-            setButton.label = "Set";
-            setButton.clicked.connect (() =>
-            {
-                if (lightView.get_selected_row () != null)
+                lightView.row_selected.connect ((row) =>
                 {
-                    var row = ((LightListBoxRow)lightView.get_selected_row ());
+                    var lightRow = ((LightListBoxRow)row);
+                    nameEntry.text = lightRow.LightName;
+                    leaf1.set_visible_child (headrbar2);
+                    leaf2.set_visible_child (contentBox);
+                    setButton.set_sensitive (true);
+                    nameEntry.set_sensitive (true);
+                });
 
-                    var rgba = chooser.SelectedColor;
-                    uint8 red = ((uint8)(rgba.red * 255));
-                    uint8 green = ((uint8)(rgba.green * 255));
-                    uint8 blue = ((uint8)(rgba.blue * 255));
+                contentBox.pack_start (setButton, false, false);
+
+                var searchButton = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
+                searchButton.margin = 5;
+
+                searchButton.clicked.connect (() =>
+                {
+                    Gtk.Box spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+                    spinnerBox.valign = Gtk.Align.CENTER;
+                    Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
+
+                    Gtk.Spinner spinner = new Gtk.Spinner ();
+                    spinner.margin = 10;
+                    spinner.width_request = 32;
+                    spinner.height_request = 32;
+
+                    spinnerBox.add (spinner);
+                    spinnerBox.add (spinnerLabel);
+
+                    scrolledWindow.remove (lightView);
+                    scrolledWindow.add (spinnerBox);
+                    scrolledWindow.show_all ();
+                    spinner.start ();
+
+                    debug ("Searching for lights...\n");
+                    lightView.clear ();
+
+                    LightDiscovery dl = new LightDiscovery ();
+                    ObservableList<Huely.Light> lights = new ObservableList<Huely.Light> ();
 
                     var loop = new MainLoop();
-                    row.light.ConnectAsync.begin((obj, res) =>
+                    dl.DiscoverLightsAsync.begin((obj, res) =>
                     {
-                        row.light.ConnectAsync.end (res);
+                        lights = dl.DiscoverLightsAsync.end (res);
                         loop.quit();
                     });
                     loop.run();
 
-                    row.set_name (nameEntry.text);
-                    row.light.SetColor (red, green, blue);
-                }
-            });
+                    lightView.clear ();
+                    lightView.add_lights (lights.data);
+                    lightView.show_all();
 
-            setButton.set_sensitive (false);
-
-            lightView.row_selected.connect ((row) =>
-            {
-                var lightRow = ((LightListBoxRow)row);
-                nameEntry.text = lightRow.LightName;
-                leaf1.set_visible_child (headrbar2);
-                leaf2.set_visible_child (contentBox);
-                setButton.set_sensitive (true);
-                nameEntry.set_sensitive (true);
-            });
-
-            contentBox.pack_start (setButton, false, false);
-
-            var searchButton = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
-            searchButton.margin = 5;
-
-            searchButton.clicked.connect (() =>
-            {
-                Gtk.Box spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-                spinnerBox.valign = Gtk.Align.CENTER;
-                Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
-
-                Gtk.Spinner spinner = new Gtk.Spinner ();
-                spinner.margin = 10;
-                spinner.width_request = 32;
-                spinner.height_request = 32;
-
-                spinnerBox.add (spinner);
-                spinnerBox.add (spinnerLabel);
-
-                scrolledWindow.remove (lightView);
-                scrolledWindow.add (spinnerBox);
-                scrolledWindow.show_all ();
-                spinner.start ();
-
-                debug ("Searching for lights...\n");
-                lightView.clear ();
-
-                LightDiscovery dl = new LightDiscovery ();
-                ObservableList<Huely.Light> lights = new ObservableList<Huely.Light> ();
-
-                var loop = new MainLoop();
-                dl.DiscoverLightsAsync.begin((obj, res) =>
-                {
-                    lights = dl.DiscoverLightsAsync.end (res);
-                    loop.quit();
+                    spinner.stop ();
+                    scrolledWindow.remove (spinnerBox);
+                    scrolledWindow.add (lightView);
+                    scrolledWindow.show_all ();
                 });
-                loop.run();
 
-                lightView.clear ();
-                lightView.add_lights (lights.data);
-                lightView.show_all();
+                headrbar1.pack_start (searchButton);
+                headrbar1.pack_end (settingsButtonLeft);
 
-                spinner.stop ();
-                scrolledWindow.remove (spinnerBox);
-                scrolledWindow.add (lightView);
-                scrolledWindow.show_all ();
-            });
+                leaf2.add (scrolledWindow);
+                leaf2.add (contentBox);
+                leaf2.valign = Gtk.Align.FILL;
 
-            headrbar1.pack_start (searchButton);
-            headrbar1.pack_end (settingsButtonLeft);
+                // About Deck
+                Hdy.HeaderBar aboutHeader = new Hdy.HeaderBar ();
+                Gtk.Button aboutBackButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
 
-            leaf2.add (scrolledWindow);
-            leaf2.add (contentBox);
-            leaf2.valign = Gtk.Align.FILL;
+                aboutBackButton.clicked.connect (() =>
+                {
+                    deck1.set_visible_child (mainBox);
+                });
 
-            // About Deck
-            Hdy.HeaderBar aboutHeader = new Hdy.HeaderBar ();
-            Gtk.Button aboutBackButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
+                aboutHeader.set_title ("About");
+                aboutHeader.show_close_button = true;
+                aboutHeader.pack_start (aboutBackButton);
 
-            aboutBackButton.clicked.connect (() =>
-            {
-                deck1.set_visible_child (mainBox);
-            });
+                var aboutImage = new Gtk.Image.from_icon_name ("com.github.benpocalypse.Huely", Gtk.IconSize.DIALOG);
+                aboutImage.pixel_size = 128;
 
-            aboutHeader.set_title ("About");
-            aboutHeader.show_close_button = true;
-            aboutHeader.pack_start (aboutBackButton);
+                aboutBox.pack_start (aboutHeader, false, false);
+                aboutBox.pack_start (aboutImage, false, false, 10);
 
-            var aboutImage = new Gtk.Image.from_icon_name ("com.github.benpocalypse.Huely", Gtk.IconSize.DIALOG);
-            aboutImage.pixel_size = 128;
+                var aboutNameLabel = new Gtk.Label ("");
+                aboutNameLabel.set_markup ("<b>Huely</b>");
 
-            aboutBox.pack_start (aboutHeader, false, false);
-            aboutBox.pack_start (aboutImage, false, false, 10);
+                var aboutWebsiteLabel = new Gtk.Label("");
+                aboutWebsiteLabel.set_markup ("<a href='https://github.com/benpocalypse/Huely'>Website</a>");
+                aboutBox.pack_start (aboutNameLabel, false, false);
+                aboutBox.pack_start (new Gtk.Label (@"v$(Constants.Config.VERSION)"), false, false);
+                aboutBox.pack_start (aboutWebsiteLabel, false, false, 10);
+                aboutBox.pack_start (new Gtk.Label (@"Color your workspace."), false, false);
+                aboutBox.pack_start (new Gtk.Label (@"© Ben Foote"), false, false);
+                aboutBox.pack_end (new Gtk.Label (""), true, true);
 
-            var aboutNameLabel = new Gtk.Label ("");
-            aboutNameLabel.set_markup ("<b>Huely</b>");
+                // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
+                Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
+                sizegroup1.add_widget (headrbar1);
+                sizegroup1.add_widget (scrolledWindow);
 
-            var aboutWebsiteLabel = new Gtk.Label("");
-            aboutWebsiteLabel.set_markup ("<a href='https://github.com/benpocalypse/Huely'>Website</a>");
-            aboutBox.pack_start (aboutNameLabel, false, false);
-            aboutBox.pack_start (new Gtk.Label (@"v$(Constants.Config.VERSION)"), false, false);
-            aboutBox.pack_start (aboutWebsiteLabel, false, false, 10);
-            aboutBox.pack_start (new Gtk.Label (@"Color your workspace."), false, false);
-            aboutBox.pack_start (new Gtk.Label (@"© Ben Foote"), false, false);
-            aboutBox.pack_end (new Gtk.Label (""), true, true);
+                Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
+                sizegroup3.add_widget (headrbar2);
+                sizegroup3.add_widget (contentBox);
 
-            // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
-            Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            sizegroup1.add_widget (headrbar1);
-            sizegroup1.add_widget (scrolledWindow);
+                mainBox.pack_start (titlebar, false, false);
+                mainBox.pack_start (leaf2, true, true);
 
-            Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            sizegroup3.add_widget (headrbar2);
-            sizegroup3.add_widget (contentBox);
+                aboutScrolledWindow.add (aboutBox);
+                aboutScrolledWindow.valign = Gtk.Align.FILL;
+                aboutScrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
 
-            mainBox.pack_start (titlebar, false, false);
-            mainBox.pack_start (leaf2, true, true);
+                deck1.prepend (aboutScrolledWindow);
+                deck1.prepend (mainBox);
 
-            aboutScrolledWindow.add (aboutBox);
-            aboutScrolledWindow.valign = Gtk.Align.FILL;
-            aboutScrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+                Idle.add((owned) callback);
+                return true;
+            };
+            new Thread<bool>("create-layout-thread", run);
 
-            deck1.prepend (aboutScrolledWindow);
-            deck1.prepend (mainBox);
+            yield;
 
+            remove (initialBox);
             add (deck1);
         }
 

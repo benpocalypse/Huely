@@ -58,7 +58,11 @@ public class Huely.Light : Object
             try
             {
                 //_socket.set_timeout (1);
-                IsConnected = _socket.connect (address);
+                if (!_socket.is_connected ())
+                {
+                    IsConnected = _socket.connect (address);
+                }
+
                 debug (@"Connected = $IsConnected\n");
 
                 var getProtcolLoop = new MainLoop();

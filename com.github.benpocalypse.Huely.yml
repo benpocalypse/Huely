@@ -55,5 +55,5 @@ modules:
       - type: git
         url: https://github.com/benpocalypse/Huely.git
         branch: 0.3.0
-        commit: a991ec06ede80e5ca49af5971c52c58e2958c0a8
+ #       commit: a991ec06ede80e5ca49af5971c52c58e2958c0a8
 
