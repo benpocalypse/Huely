@@ -89,24 +89,9 @@ namespace Huely {
         // Layout.
         private LightView lightView = new LightView ();
         private Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
-        private Gtk.Box initialBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
         private void CreateInitialLayout ()
         {
-            initialBox.valign = Gtk.Align.CENTER;
-            Gtk.Image img = new Gtk.Image.from_icon_name ("com.github.benpocalypse.Huely", Gtk.IconSize.DIALOG);
-
-            Gtk.Spinner spinner = new Gtk.Spinner ();
-            spinner.margin = 10;
-            spinner.width_request = 32;
-            spinner.height_request = 32;
-            spinner.start ();
-
-            initialBox.add (img);
-            initialBox.add (spinner);
-
-            add (initialBox);
-
             var createLayoutLoop = new MainLoop();
             CreateRealLayoutAsync.begin((obj, res) =>
             {
@@ -430,7 +415,6 @@ namespace Huely {
 
             yield;
 
-            remove (initialBox);
             add (deck1);
         }
 
@@ -440,10 +424,12 @@ namespace Huely {
 
             var helpButton = new Gtk.ModelButton ();
             helpButton.text = "Help";
+            helpButton.margin = 5;
             helpButton.clicked.connect (() =>  GLib.AppInfo.launch_default_for_uri ("https://github.com/benpocalypse/Huely", new GLib.AppLaunchContext ()));
 
             var aboutButton = new Gtk.ModelButton ();
             aboutButton.text = "About";
+            aboutButton.margin = 5;
             aboutButton.clicked.connect (() => deck.set_visible_child (aboutScrolledWindow));
 
             menuBox.pack_start (helpButton);
