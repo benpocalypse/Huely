@@ -469,7 +469,7 @@ namespace Huely {
             int numLights;
 
             numLights = Huely.saved_state.get_int ("num-lights");
-
+            print (@"numLights = $(numLights)\n");
 
             // TODO - use this logic to validate our schema is up to date.
             var derp = Huely.saved_state.list_keys ();
@@ -489,13 +489,16 @@ namespace Huely {
 
                 print (@"Loading lightColor = $(lightColor)\n");
                 debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
-                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp)
-                {
-                    Name = lightName,
-                    Red = (uint8)lightColor.red,
-                    Green = (uint8)lightColor.green,
-                    Blue = (uint8)lightColor.blue
-                });
+
+                lightView.ViewModel.Lights.add (
+                    new Huely.Light.with_ip_and_name_and_color (
+                        lightIp,
+                        lightName,
+                        (uint8)lightColor.red,
+                        (uint8)lightColor.green,
+                        (uint8)lightColor.blue
+                        )
+                    );
                 lightView.show_all ();
             }
 

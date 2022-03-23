@@ -44,6 +44,37 @@ public class Huely.Light : Object
         }
     }
 
+    public Light.with_ip_and_name_and_color (string ip, string name, uint8 red, uint8 green, uint8 blue)
+    {
+        IsConnected = false;
+        _useChecksum = true;
+        _protocol = LedProtocol.UNKNOWN;
+        IpAddress = ip;
+        Name = name;
+        Red = red;
+        Green = green;
+        Blue = blue;
+
+        try
+        {
+            _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
+
+            this.SetColor (Red, Green, Blue);
+        }
+        catch (GLib.Error ex)
+        {
+            print (@"Encountered error constrtucting new Light: $(ex.message)\n");
+        }
+    }
+
     // Communications functions
     public async void ConnectAsync ()
     {
