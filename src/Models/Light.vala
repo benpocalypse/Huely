@@ -5,9 +5,9 @@ public class Huely.Light : Object
     public string IpAddress { get; set; }
     public bool IsOn { get; set; }
     public bool IsConnected { get; set; }
-    public uint8 Red { get; private set; }
-    public uint8 Green { get; private set; }
-    public uint8 Blue { get; private set; }
+    public uint8 Red { get; set; }
+    public uint8 Green { get; set; }
+    public uint8 Blue { get; set; }
     public uint8 Brightness { get; private set; }
 
     private bool _useChecksum;
@@ -195,14 +195,6 @@ public class Huely.Light : Object
                 debug (@"Light.isOn = $IsOn\n");
             }
 
-            // Check color.
-            Red = dataRaw[6];
-            Green = dataRaw[7];
-            Blue = dataRaw[8];
-
-            // Update brightness.
-            UpdateBrightness();
-
             Idle.add((owned) callback);
             return true;
         };
@@ -214,19 +206,6 @@ public class Huely.Light : Object
         //Send request to get the time of the light.
         Time = await GetTimeAsync();
         */
-    }
-
-    private void UpdateBrightness ()
-    {
-        int max = 0;
-
-        if (Red > max) max = Red;
-        if (Green > max) max = Green;
-        if (Blue > max) max = Blue;
-
-        max = max * 100 / 255;
-
-        Brightness = ((uint8)max);
     }
 
     public void set_state (bool turnOn)
@@ -273,6 +252,16 @@ public class Huely.Light : Object
 
     public void SetColor (uint8 red, uint8 green, uint8 blue)
     {
+        Red = red;
+        Green = green;
+        Blue = blue;
+
+        print (@"SetColor(): red = $(red), green = $(green), blue = $(blue), brightness = $(Brightness)\n");
+
+        var redBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Blue) ) );
+
         if (IsConnected == false)
         {
             var loop = new MainLoop();
@@ -286,17 +275,14 @@ public class Huely.Light : Object
 
         if (_protocol == LedProtocol.LEDENET)
         {
-            uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
-            debug (@"args.length = $(args.length)\n");
+            uint8[] args = {0x41, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0x00, 0x00, 0x0F};
             send_data (args);
         }
         else
         {
-            uint8[] args = {0x56, red, green, blue, 0xAA};
+            uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
             send_data (args);
         }
-
-        UpdateBrightness();
     }
 
     public void SetBrightness (double brightness)
@@ -306,13 +292,35 @@ public class Huely.Light : Object
             brightness = 100;
         }
 
-        var redBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Red) ) );
-        var greenBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Green) ) );
-        var blueBrightnessFactor = ((uint8) ( (brightness / 100) * ((double)Blue) ) );
-
-        SetColor (redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor);
-
         Brightness = (uint8)brightness;
+
+        print (@"SetBrightness(): red = $(Red), green = $(Green), blue = $(Blue), brightness = $(Brightness)\n");
+
+        var redBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Blue) ) );
+
+        if (IsConnected == false)
+        {
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
+        }
+
+        if (_protocol == LedProtocol.LEDENET)
+        {
+            uint8[] args = {0x41, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0x00, 0x00, 0x0F};
+            send_data (args);
+        }
+        else
+        {
+            uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
+            send_data (args);
+        }
     }
 
     public DateTime get_time2 ()

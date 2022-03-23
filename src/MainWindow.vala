@@ -132,6 +132,7 @@ namespace Huely {
                 Gtk.ScrolledWindow scrolledWindow = new Gtk.ScrolledWindow (null, null);
                 scrolledWindow.valign = Gtk.Align.FILL;
                 scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
+                scrolledWindow.width_request = 250;
                 scrolledWindow.add (lightView);
 
                 Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
@@ -288,6 +289,7 @@ namespace Huely {
 
                         row.set_name (nameEntry.text);
                         row.light.SetColor (red, green, blue);
+                        row.light.SetBrightness (row.light.Brightness);
                     }
                 });
 
@@ -463,18 +465,37 @@ namespace Huely {
 
             string lightName;
             string lightIp;
-            string lightColor;
+            string lightColorString;
             int numLights;
 
             numLights = Huely.saved_state.get_int ("num-lights");
+
+
+            // TODO - use this logic to validate our schema is up to date.
+            var derp = Huely.saved_state.list_keys ();
+            foreach (string s in derp)
+            {
+                print (@"Found child $(s)\n");
+            }
 
             for (int i =0; i < numLights; i++)
             {
                 lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
                 lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
-                lightColor = Huely.saved_state.get_string (@"light-color-$(i+1)");
+                lightColorString = Huely.saved_state.get_string (@"light-color-$(i+1)");
+                print (@"Loading lightColorString = $(lightColorString)\n");
+                Gdk.RGBA lightColor = Gdk.RGBA ();
+                lightColor.parse (lightColorString);
+
+                print (@"Loading lightColor = $(lightColor)\n");
                 debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
-                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp) { Name = lightName }); //, Color = lightColor });
+                lightView.ViewModel.Lights.add (new Huely.Light.with_ip (lightIp)
+                {
+                    Name = lightName,
+                    Red = (uint8)lightColor.red,
+                    Green = (uint8)lightColor.green,
+                    Blue = (uint8)lightColor.blue
+                });
                 lightView.show_all ();
             }
 
@@ -529,9 +550,19 @@ namespace Huely {
 
             for (int i = 0; i < numLights; i++)
             {
+                Gdk.RGBA color = Gdk.RGBA ();
+                color.parse ("#" +
+                    lightView.ViewModel.Lights[i].Red.to_string ("%x") +
+                    lightView.ViewModel.Lights[i].Green.to_string ("%x") +
+                    lightView.ViewModel.Lights[i].Blue.to_string ("%x")
+                    );
+                print (@"Saving red = $(lightView.ViewModel.Lights[i].Red)\n");
+                print (@"Saving lightColor = $(color), Red = $(lightView.ViewModel.Lights[i].Red.to_string ("%x")), Green = $(lightView.ViewModel.Lights[i].Green.to_string ("%x"))\n");
                 Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].Name);
                 Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].IpAddress);
-                //Huely.saved_state.set_value (@"light-color-$(i+1)", lightView.ViewModel.Lights[i].Color);
+                Huely.saved_state.set_value (@"light-color-$(i+1)", "#" + lightView.ViewModel.Lights[i].Red.to_string ("%x") +
+                    lightView.ViewModel.Lights[i].Green.to_string ("%x") +
+                    lightView.ViewModel.Lights[i].Blue.to_string ("%x"));
             }
         }
 
