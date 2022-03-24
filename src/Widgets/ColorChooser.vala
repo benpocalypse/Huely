@@ -2,6 +2,8 @@ public class Huely.ColorChooser : Gtk.Grid
 {
     public Gdk.RGBA SelectedColor;
     private Huely.ColorGridButton _previouslyClickedButton = null;
+    private int NumberOfColumns = 0;
+    private int NumberOfRows = 0;
 
     public ColorChooser (int numColumns, string [] paletteString)
     {
@@ -58,6 +60,25 @@ public class Huely.ColorChooser : Gtk.Grid
             {
                 x = 0;
                 y++;
+            }
+        }
+
+        NumberOfColumns = numColumns + 1;
+        NumberOfRows = y;
+    }
+
+    public void ChooseColor (Gdk.RGBA color)
+    {
+        for (int i = 0; i < NumberOfColumns; i++)
+        {
+            for (int j = 0; j < NumberOfRows; j++)
+            {
+                var btn = (Huely.ColorGridButton)this.get_child_at (i,j);
+                if (btn.Color == color)
+                {
+                    HandlePreviousButtonClick ();
+                    HandleClick (btn);
+                }
             }
         }
     }

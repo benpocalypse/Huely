@@ -303,6 +303,7 @@ namespace Huely {
                     leaf2.set_visible_child (contentBox);
                     setButton.set_sensitive (true);
                     nameEntry.set_sensitive (true);
+                    chooser.ChooseColor (lightRow.light.Color);
                 });
 
                 contentBox.pack_start (setButton, false, false);
@@ -463,40 +464,28 @@ namespace Huely {
             var rect = Gdk.Rectangle ();
             Huely.saved_state.get ("window-size", "(ii)", out rect.width, out rect.height);
 
-            string lightName;
-            string lightIp;
-            string lightColorString;
-            int numLights;
-
-            numLights = Huely.saved_state.get_int ("num-lights");
-            print (@"numLights = $(numLights)\n");
-
-            // TODO - use this logic to validate our schema is up to date.
-            var derp = Huely.saved_state.list_keys ();
-            foreach (string s in derp)
-            {
-                print (@"Found child $(s)\n");
-            }
+            var numLights = Huely.saved_state.get_int ("num-lights");
 
             for (int i =0; i < numLights; i++)
             {
-                lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
-                lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
-                lightColorString = Huely.saved_state.get_string (@"light-color-$(i+1)");
-                print (@"Loading lightColorString = $(lightColorString)\n");
+                string lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
+                string lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
+                string lightColorString = Huely.saved_state.get_string (@"light-color-$(i+1)");
+                string brightness = Huely.saved_state.get_string (@"light-brightness-$(i+1)");
+
                 Gdk.RGBA lightColor = Gdk.RGBA ();
                 lightColor.parse (lightColorString);
 
-                print (@"Loading lightColor = $(lightColor)\n");
                 debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
 
                 lightView.ViewModel.Lights.add (
-                    new Huely.Light.with_ip_and_name_and_color (
+                    new Huely.Light.with_ip_and_name_and_color_and_brightness (
                         lightIp,
                         lightName,
-                        (uint8)lightColor.red,
-                        (uint8)lightColor.green,
-                        (uint8)lightColor.blue
+                        ((uint8)(lightColor.red * 255)),
+                        ((uint8)(lightColor.green * 255)),
+                        ((uint8)(lightColor.blue * 255)),
+                        (uint8)(int.parse(brightness))
                         )
                     );
                 lightView.show_all ();
@@ -559,13 +548,14 @@ namespace Huely {
                     lightView.ViewModel.Lights[i].Green.to_string ("%x") +
                     lightView.ViewModel.Lights[i].Blue.to_string ("%x")
                     );
-                print (@"Saving red = $(lightView.ViewModel.Lights[i].Red)\n");
-                print (@"Saving lightColor = $(color), Red = $(lightView.ViewModel.Lights[i].Red.to_string ("%x")), Green = $(lightView.ViewModel.Lights[i].Green.to_string ("%x"))\n");
+
                 Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].Name);
                 Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].IpAddress);
-                Huely.saved_state.set_value (@"light-color-$(i+1)", "#" + lightView.ViewModel.Lights[i].Red.to_string ("%x") +
+                Huely.saved_state.set_value (@"light-color-$(i+1)", "#" +
+                    lightView.ViewModel.Lights[i].Red.to_string ("%x") +
                     lightView.ViewModel.Lights[i].Green.to_string ("%x") +
                     lightView.ViewModel.Lights[i].Blue.to_string ("%x"));
+                Huely.saved_state.set_value (@"light-brightness-$(i+1)", lightView.ViewModel.Lights[i].Brightness.to_string ());
             }
         }
 

@@ -8,7 +8,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
     public Gtk.Label _lightName;
     private Gtk.Label _ipAddress;
 
-    public Huely.Light? light { get; set; }//construct; }
+    public Huely.Light? light { get; set; }
 
     construct
     {
@@ -62,11 +62,10 @@ public class LightListBoxRow : Gtk.ListBoxRow
         brightnessScale.margin_left = 10;
         brightnessScale.margin_right = 10;
         brightnessScale.set_draw_value (false);
-
+        brightnessScale.set_value (light.Brightness);
 
         brightnessScale.button_release_event.connect ((val) =>
         {
-            print (@"brightnessScale.drag_end.connect $(brightnessScale.get_value())\n");
             light.SetBrightness (brightnessScale.get_value()); //(val.get_value ());
             return base.button_release_event (val);
         });
@@ -84,6 +83,14 @@ public class LightListBoxRow : Gtk.ListBoxRow
         });
 
         var connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
+        if (light.IsConnected == true)
+        {
+            connectedIcon = new Gtk.Image.from_icon_name ("network-wireless-signal-excellent-symbolic", Gtk.IconSize.BUTTON);
+        }
+        else
+        {
+            connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
+        }
 
         Gdk.RGBA parser = Gdk.RGBA ();
         parser.parse ("#" + light.Red.to_string ("%x") + light.Green.to_string ("%x") + light.Blue.to_string ("%x"));
@@ -99,16 +106,21 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
         light.notify.connect (() =>
         {
-            print (@"light.notify.connect (())\n");
             colorButton.set_active(light.IsOn);
 
             parser.parse ("#" + light.Red.to_string ("%x") + light.Green.to_string ("%x") + light.Blue.to_string ("%x"));
-
-            print (@"$(parser.to_string ())");
-
             lightColorButton.Color = parser;
 
             brightnessScale.set_value (light.Brightness);
+
+            if (light.IsConnected == true)
+            {
+                connectedIcon = new Gtk.Image.from_icon_name ("network-wireless-signal-excellent-symbolic", Gtk.IconSize.BUTTON);
+            }
+            else
+            {
+                connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
+            }
 
             this.show_all ();
         });

@@ -9,6 +9,17 @@ public class Huely.Light : Object
     public uint8 Green { get; set; }
     public uint8 Blue { get; set; }
     public uint8 Brightness { get; private set; }
+    public Gdk.RGBA Color
+    {
+        get
+        {
+            var tempParser = Gdk.RGBA ();
+            tempParser.parse ("#" + Red.to_string ("%x") + Green.to_string ("%x") + Blue.to_string ("%x"));
+            return tempParser;
+        }
+
+        private set {}
+    }
 
     private bool _useChecksum;
     private LedProtocol _protocol;
@@ -44,7 +55,7 @@ public class Huely.Light : Object
         }
     }
 
-    public Light.with_ip_and_name_and_color (string ip, string name, uint8 red, uint8 green, uint8 blue)
+    public Light.with_ip_and_name_and_color_and_brightness (string ip, string name, uint8 red, uint8 green, uint8 blue, uint8 brightness)
     {
         IsConnected = false;
         _useChecksum = true;
@@ -54,6 +65,7 @@ public class Huely.Light : Object
         Red = red;
         Green = green;
         Blue = blue;
+        Brightness = brightness;
 
         try
         {
@@ -88,10 +100,13 @@ public class Huely.Light : Object
         {
             try
             {
-                //_socket.set_timeout (1);
-                if (!_socket.is_connected ())
+                if (IsConnected == false)
                 {
                     IsConnected = _socket.connect (address);
+                }
+                else
+                {
+                    IsConnected = false;
                 }
 
                 debug (@"Connected = $IsConnected\n");
@@ -124,6 +139,8 @@ public class Huely.Light : Object
         new Thread<bool>("light-connect-thread", run);
 
         yield;
+
+        this.notify_property("IsConnected");
     }
 
     private async LedProtocol GetProtocolAsync ()
@@ -287,11 +304,9 @@ public class Huely.Light : Object
         Green = green;
         Blue = blue;
 
-        print (@"SetColor(): red = $(red), green = $(green), blue = $(blue), brightness = $(Brightness)\n");
-
-        var redBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Red) ) );
-        var greenBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Green) ) );
-        var blueBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Blue) ) );
+        var redBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Blue) ) );
 
         if (IsConnected == false)
         {
@@ -314,6 +329,10 @@ public class Huely.Light : Object
             uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
             send_data (args);
         }
+
+        this.notify_property ("Red");
+        this.notify_property ("Green");
+        this.notify_property ("Blue");
     }
 
     public void SetBrightness (double brightness)
@@ -325,11 +344,9 @@ public class Huely.Light : Object
 
         Brightness = (uint8)brightness;
 
-        print (@"SetBrightness(): red = $(Red), green = $(Green), blue = $(Blue), brightness = $(Brightness)\n");
-
-        var redBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Red) ) );
-        var greenBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Green) ) );
-        var blueBrightnessFactor = ((uint8) ( (Brightness / 100) * ((double)Blue) ) );
+        var redBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Blue) ) );
 
         if (IsConnected == false)
         {
@@ -352,6 +369,8 @@ public class Huely.Light : Object
             uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
             send_data (args);
         }
+
+        this.notify_property ("Brightness");
     }
 
     public DateTime get_time2 ()
