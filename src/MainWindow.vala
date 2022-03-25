@@ -140,6 +140,7 @@ namespace Huely {
                 {
                     leaf1.set_visible_child (headrbar1);
                     leaf2.set_visible_child (scrolledWindow);
+                    lightView.unselect_all ();
                 });
 
                 Gtk.Button settingsButtonRight = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
@@ -297,13 +298,16 @@ namespace Huely {
 
                 lightView.row_selected.connect ((row) =>
                 {
-                    var lightRow = ((LightListBoxRow)row);
-                    nameEntry.text = lightRow.LightName;
-                    leaf1.set_visible_child (headrbar2);
-                    leaf2.set_visible_child (contentBox);
-                    setButton.set_sensitive (true);
-                    nameEntry.set_sensitive (true);
-                    chooser.ChooseColor (lightRow.light.Color);
+                    if (row != null)
+                    {
+                        var lightRow = ((LightListBoxRow)row);
+                        nameEntry.text = lightRow.LightName;
+                        setButton.set_sensitive (true);
+                        nameEntry.set_sensitive (true);
+                        leaf1.set_visible_child (headrbar2);
+                        leaf2.set_visible_child (contentBox);
+                        chooser.ChooseColor (lightRow.light.Color);
+                    }
                 });
 
                 contentBox.pack_start (setButton, false, false);

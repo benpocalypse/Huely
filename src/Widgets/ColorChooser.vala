@@ -14,8 +14,6 @@ public class Huely.ColorChooser : Gtk.Grid
         int x = 0;
         int y = 0;
 
-        bool firstButton = true;
-
         foreach (var s in paletteString)
         {
             Gdk.RGBA parser = Gdk.RGBA ();
@@ -23,14 +21,6 @@ public class Huely.ColorChooser : Gtk.Grid
             palette += parser;
 
             Huely.ColorGridButton colorButton = new Huely.ColorGridButton ();
-
-            if (firstButton)
-            {
-                colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
-                SelectedColor = parser;
-                _previouslyClickedButton = colorButton;
-                firstButton = false;
-            }
 
             colorButton.Row = y;
             colorButton.Column = x;
@@ -92,6 +82,7 @@ public class Huely.ColorChooser : Gtk.Grid
             var tempColor = _previouslyClickedButton.Color;
 
             this.remove (_previouslyClickedButton);
+            this.show_all ();
 
             _previouslyClickedButton = new Huely.ColorGridButton.without_icon ();
 
@@ -113,6 +104,7 @@ public class Huely.ColorChooser : Gtk.Grid
             _previouslyClickedButton.Color = tempColor;
 
             this.attach (_previouslyClickedButton, _previouslyClickedButton.Column, _previouslyClickedButton.Row);
+            this.show_all ();
         }
     }
 
@@ -121,8 +113,6 @@ public class Huely.ColorChooser : Gtk.Grid
         var tempCol = btn.Column;
         var tempRow = btn.Row;
         var tempColor = btn.Color;
-
-        debug (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
 
         this.remove (btn);
 
@@ -141,12 +131,11 @@ public class Huely.ColorChooser : Gtk.Grid
 
             if (huelyButton.Color != SelectedColor)
             {
+                SelectedColor = huelyButton.Color;
                 HandlePreviousButtonClick ();
                 HandleClick ((Huely.ColorGridButton)btn);
             }
         });
-
-        debug (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
 
         this.attach (colorButton, colorButton.Column, colorButton.Row);
         this.show_all ();
