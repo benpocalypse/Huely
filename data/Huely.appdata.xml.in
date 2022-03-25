@@ -43,6 +43,14 @@
   </screenshots>
 
   <releases>
+    <release date="2022-03-25" version="0.3.0">
+      <description>
+        <p>New features:
+ - Brightness: Now each light has a controllable brightness level.
+ - Connection and Color: Now each light shows whether it is connected, and what the current color is.
+        </p>
+      </description>
+    </release>
     <release date="2022-03-02" version="0.2.0">
       <description>
         <p>Initial release</p>
@@ -50,12 +58,4 @@
     </release>
   </releases>
 
-  <developer_name>Ben Foote</developer_name>
-  <url type="homepage">https://github.com/benpocalypse/Huely</url>
-  <url type="bugtracker">https://github.com/benpocalypse/Huely/issues</url>
-
-  <custom>
-    <value key="Purism::form_factor">workstation</value>
-    <value key="Purism::form_factor">mobile</value>
-  </custom>
 </component>

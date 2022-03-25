@@ -6,7 +6,9 @@ Control WiFi lights using this simple app.
 
 ![Huely screenshot](./screenshots/en/light-and-dark.png)
 
-[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.benpocalypse.Huely])
+[![Geyt it on Flathub](https://www.flathub.org/assets/badges/flathub-badge-en.png)](https://www.flathub.org/apps/details/com.github.benpocalypse.Huely)]
+
+[![Get it on AppCenter](https://appcenter.elementary.io/badge.svg)](https://appcenter.elementary.io/com.github.benpocalypse.Huely)]
 
 ## System requirements
 
