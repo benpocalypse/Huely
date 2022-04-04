@@ -3,46 +3,29 @@ public class Huely.Light : Object
     // TODO - Evaluate get/set public/private concerns.
     public string Name { get; set; }
     public string IpAddress { get; set; }
-    public string Color { get; set; }
     public bool IsOn { get; set; }
     public bool IsConnected { get; set; }
+    public uint8 Red { get; set; }
+    public uint8 Green { get; set; }
+    public uint8 Blue { get; set; }
+    public uint8 Brightness { get; private set; }
+    public Gdk.RGBA Color
+    {
+        get
+        {
+            var tempParser = Gdk.RGBA ();
+            tempParser.parse ("#" + Red.to_string ("%x") + Green.to_string ("%x") + Blue.to_string ("%x"));
+            return tempParser;
+        }
+
+        private set {}
+    }
 
     private bool _useChecksum;
     private LedProtocol _protocol;
 
-    private uint8 brightness { get; private set; }
     private DateTime time { get; private set; }
-
-    private enum TransitionType { Gradual = 0x3a, Strobe = 0x3c, Jump = 0x3b }
     private enum LedProtocol { LEDENET, LEDENET_ORIGINAL, UNKNOWN }
-    private enum LightMode { Color, WarmWhite, Preset, Custom, Unknown }
-    private enum PresetPattern
-    {
-        SevenColorsCrossFade = 0x25,
-        RedGradualChange = 0x26,
-        GreenGradualChange = 0x27,
-        BlueGradualChange = 0x28,
-        YellowGradualChange = 0x29,
-        CyanGradualChange = 0x2a,
-        PurpleGradualChange = 0x2b,
-        WhiteGradualChange = 0x2c,
-        RedGreenCrossFade = 0x2d,
-        RedBlueCrossFade = 0x2e,
-        GreenBlueCrossFade = 0x2f,
-        SevenColorStrobeFlash = 0x30,
-        RedStrobeFlash = 0x31,
-        GreenStrobeFlash = 0x32,
-        BlueStrobeFlash = 0x33,
-        YellowStrobeFlash = 0x34,
-        CyanStrobeFlash = 0x35,
-        PurpleStrobeFlash = 0x36,
-        WhiteStrobeFlash = 0x37,
-        SevenColorsJumping = 0x38
-    }
-
-    // TODO - Decide if I want to keep/implement these.
-    private uint8 WarmWhite { get; private set; }
-    private LightMode Mode { get; private set; }
 
     private GLib.Socket _socket;
     private const uint16 PORT = 5577;
@@ -72,6 +55,38 @@ public class Huely.Light : Object
         }
     }
 
+    public Light.with_ip_and_name_and_color_and_brightness (string ip, string name, uint8 red, uint8 green, uint8 blue, uint8 brightness)
+    {
+        IsConnected = false;
+        _useChecksum = true;
+        _protocol = LedProtocol.UNKNOWN;
+        IpAddress = ip;
+        Name = name;
+        Red = red;
+        Green = green;
+        Blue = blue;
+        Brightness = brightness;
+
+        try
+        {
+            _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
+
+            this.SetColor (Red, Green, Blue);
+        }
+        catch (GLib.Error ex)
+        {
+            print (@"Encountered error constrtucting new Light: $(ex.message)\n");
+        }
+    }
+
     // Communications functions
     public async void ConnectAsync ()
     {
@@ -85,8 +100,15 @@ public class Huely.Light : Object
         {
             try
             {
-                //_socket.set_timeout (1);
-                IsConnected = _socket.connect (address);
+                if (IsConnected == false)
+                {
+                    IsConnected = _socket.connect (address);
+                }
+                else
+                {
+                    IsConnected = false;
+                }
+
                 debug (@"Connected = $IsConnected\n");
 
                 var getProtcolLoop = new MainLoop();
@@ -117,6 +139,8 @@ public class Huely.Light : Object
         new Thread<bool>("light-connect-thread", run);
 
         yield;
+
+        this.notify_property("IsConnected");
     }
 
     private async LedProtocol GetProtocolAsync ()
@@ -227,30 +251,6 @@ public class Huely.Light : Object
         yield;
 
         /*
-        //Check light mode.
-        Mode = Utilis.DetermineMode(dataHex[3], dataHex[9]);
-
-        //Handle color property.
-        switch (Mode)
-        {
-            case LightMode.Color:
-                Color = new Color(dataRaw[6], dataRaw[7], dataRaw[8]);
-                WarmWhite = 0;
-                break;
-            case LightMode.WarmWhite:
-                Color = Colors.Empty;
-                WarmWhite = dataRaw[9];
-                break;
-            case LightMode.Preset:
-            case LightMode.Unknown:
-            case LightMode.Custom:
-                Color = Colors.Empty;
-                WarmWhite = 0;
-                break;
-        }
-
-        UpdateBrightness();
-
         //Send request to get the time of the light.
         Time = await GetTimeAsync();
         */
@@ -298,8 +298,16 @@ public class Huely.Light : Object
         IsOn = false;
     }
 
-    public void set_color2 (uint8 red, uint8 green, uint8 blue)
+    public void SetColor (uint8 red, uint8 green, uint8 blue)
     {
+        Red = red;
+        Green = green;
+        Blue = blue;
+
+        var redBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Blue) ) );
+
         if (IsConnected == false)
         {
             var loop = new MainLoop();
@@ -313,24 +321,57 @@ public class Huely.Light : Object
 
         if (_protocol == LedProtocol.LEDENET)
         {
-            uint8[] args = {0x41, red, green, blue, 0x00, 0x00, 0x0F};
-            debug (@"args.length = $(args.length)\n");
+            uint8[] args = {0x41, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0x00, 0x00, 0x0F};
             send_data (args);
         }
         else
         {
-            uint8[] args = {0x56, red, green, blue, 0xAA};
+            uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
             send_data (args);
         }
 
-        Color = red.to_string ("%x") + green.to_string ("%x") + blue.to_string ("%x");
-
-        //Populate fields
-        //Color = color;
-        //WarmWhite = 0;
-        //UpdateBrightness();
+        this.notify_property ("Red");
+        this.notify_property ("Green");
+        this.notify_property ("Blue");
     }
 
+    public void SetBrightness (double brightness)
+    {
+        if (brightness > 100)
+        {
+            brightness = 100;
+        }
+
+        Brightness = (uint8)brightness;
+
+        var redBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Red) ) );
+        var greenBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Green) ) );
+        var blueBrightnessFactor = ((uint8) ( (((double)Brightness) / 100) * ((double)Blue) ) );
+
+        if (IsConnected == false)
+        {
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
+        }
+
+        if (_protocol == LedProtocol.LEDENET)
+        {
+            uint8[] args = {0x41, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0x00, 0x00, 0x0F};
+            send_data (args);
+        }
+        else
+        {
+            uint8[] args = {0x56, redBrightnessFactor, greenBrightnessFactor, blueBrightnessFactor, 0xAA};
+            send_data (args);
+        }
+
+        this.notify_property ("Brightness");
+    }
 
     public DateTime get_time2 ()
     {

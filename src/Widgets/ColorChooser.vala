@@ -2,6 +2,8 @@ public class Huely.ColorChooser : Gtk.Grid
 {
     public Gdk.RGBA SelectedColor;
     private Huely.ColorGridButton _previouslyClickedButton = null;
+    private int NumberOfColumns = 0;
+    private int NumberOfRows = 0;
 
     public ColorChooser (int numColumns, string [] paletteString)
     {
@@ -12,8 +14,6 @@ public class Huely.ColorChooser : Gtk.Grid
         int x = 0;
         int y = 0;
 
-        bool firstButton = true;
-
         foreach (var s in paletteString)
         {
             Gdk.RGBA parser = Gdk.RGBA ();
@@ -21,14 +21,6 @@ public class Huely.ColorChooser : Gtk.Grid
             palette += parser;
 
             Huely.ColorGridButton colorButton = new Huely.ColorGridButton ();
-
-            if (firstButton)
-            {
-                colorButton = new Huely.ColorGridButton.from_icon_name ("checkbox-checked-symbolic", Gtk.IconSize.BUTTON);
-                SelectedColor = parser;
-                _previouslyClickedButton = colorButton;
-                firstButton = false;
-            }
 
             colorButton.Row = y;
             colorButton.Column = x;
@@ -43,8 +35,8 @@ public class Huely.ColorChooser : Gtk.Grid
                 if (SelectedColor != huelyButton.Color)
                 {
                     SelectedColor = huelyButton.Color;
-                    handlePreviousButtonClick ();
-                    handleClick ((Huely.ColorGridButton)btn);
+                    HandlePreviousButtonClick ();
+                    HandleClick ((Huely.ColorGridButton)btn);
                 }
             });
 
@@ -60,9 +52,28 @@ public class Huely.ColorChooser : Gtk.Grid
                 y++;
             }
         }
+
+        NumberOfColumns = numColumns + 1;
+        NumberOfRows = y;
     }
 
-    private void handlePreviousButtonClick ()
+    public void ChooseColor (Gdk.RGBA color)
+    {
+        for (int i = 0; i < NumberOfColumns; i++)
+        {
+            for (int j = 0; j < NumberOfRows; j++)
+            {
+                var btn = (Huely.ColorGridButton)this.get_child_at (i,j);
+                if (btn.Color == color)
+                {
+                    HandlePreviousButtonClick ();
+                    HandleClick (btn);
+                }
+            }
+        }
+    }
+
+    private void HandlePreviousButtonClick ()
     {
         if (_previouslyClickedButton != null)
         {
@@ -71,6 +82,7 @@ public class Huely.ColorChooser : Gtk.Grid
             var tempColor = _previouslyClickedButton.Color;
 
             this.remove (_previouslyClickedButton);
+            this.show_all ();
 
             _previouslyClickedButton = new Huely.ColorGridButton.without_icon ();
 
@@ -80,9 +92,8 @@ public class Huely.ColorChooser : Gtk.Grid
 
                 if (huelyButton.Color != SelectedColor)
                 {
-
-                    handlePreviousButtonClick ();
-                    handleClick ((Huely.ColorGridButton)btn);
+                    HandlePreviousButtonClick ();
+                    HandleClick ((Huely.ColorGridButton)btn);
                 }
             });
 
@@ -93,16 +104,15 @@ public class Huely.ColorChooser : Gtk.Grid
             _previouslyClickedButton.Color = tempColor;
 
             this.attach (_previouslyClickedButton, _previouslyClickedButton.Column, _previouslyClickedButton.Row);
+            this.show_all ();
         }
     }
 
-    private void handleClick (Huely.ColorGridButton btn)
+    private void HandleClick (Huely.ColorGridButton btn)
     {
         var tempCol = btn.Column;
         var tempRow = btn.Row;
         var tempColor = btn.Color;
-
-        debug (@"btn.Column = $(tempCol), btn.Row = $(tempRow)\n");
 
         this.remove (btn);
 
@@ -121,12 +131,11 @@ public class Huely.ColorChooser : Gtk.Grid
 
             if (huelyButton.Color != SelectedColor)
             {
-                handlePreviousButtonClick ();
-                handleClick ((Huely.ColorGridButton)btn);
+                SelectedColor = huelyButton.Color;
+                HandlePreviousButtonClick ();
+                HandleClick ((Huely.ColorGridButton)btn);
             }
         });
-
-        debug (@"colorButton.Column = $(colorButton.Column), btn.Row = $(colorButton.Row)\n");
 
         this.attach (colorButton, colorButton.Column, colorButton.Row);
         this.show_all ();

@@ -43,10 +43,19 @@
   </screenshots>
 
   <releases>
+    <release date="2022-03-25" version="0.3.0">
+      <description>
+        <p>New features:
+ - Brightness: Now each light has a controllable brightness level.
+ - Connection and Color: Now each light shows whether it is connected, and what the current color is.
+        </p>
+      </description>
+    </release>
     <release date="2022-03-02" version="0.2.0">
       <description>
         <p>Initial release</p>
       </description>
     </release>
   </releases>
+
 </component>

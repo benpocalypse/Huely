@@ -4,7 +4,7 @@ public class Huely.ColorGridButton : Gtk.Button
     public int Row { get; set; }
 
     private Gdk.RGBA _color;
-    public Gdk.RGBA Color //{ get; set; }
+    public Gdk.RGBA Color
     {
         get { return this._color; }
         set

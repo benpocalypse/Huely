@@ -42,6 +42,11 @@
       <summary>Color of light 1</summary>
       <description>The saved color of light number 1</description>
     </key>
+    <key name="light-brightness-1" type="s">
+      <default>""</default>
+      <summary>Brightness of light 1</summary>
+      <description>The saved brightness of light number 1</description>
+    </key>
 
     <key name="light-name-2" type="s">
       <default>""</default>
@@ -57,6 +62,11 @@
       <default>""</default>
       <summary>Color of light 2</summary>
       <description>The saved color of light number 2</description>
+    </key>
+    <key name="light-brightness-2" type="s">
+      <default>""</default>
+      <summary>Brightness of light 2</summary>
+      <description>The saved brightness of light number 2</description>
     </key>
 
     <key name="light-name-3" type="s">
@@ -74,6 +84,11 @@
       <summary>Color of light 3</summary>
       <description>The saved color of light number 3</description>
     </key>
+    <key name="light-brightness-3" type="s">
+      <default>""</default>
+      <summary>Brightness of light 3</summary>
+      <description>The saved brightness of light number 3</description>
+    </key>
 
     <key name="light-name-4" type="s">
       <default>""</default>
@@ -90,6 +105,11 @@
       <summary>Color of light 4</summary>
       <description>The saved color of light number 4</description>
     </key>
+    <key name="light-brightness-4" type="s">
+      <default>""</default>
+      <summary>Brightness of light 4</summary>
+      <description>The saved brightness of light number 4</description>
+    </key>
 
     <key name="light-name-5" type="s">
       <default>""</default>
@@ -105,6 +125,11 @@
       <default>""</default>
       <summary>Color of light 5</summary>
       <description>The saved color of light number 5</description>
+    </key>
+    <key name="light-brightness-5" type="s">
+      <default>""</default>
+      <summary>Brightness of light 5</summary>
+      <description>The saved brightness of light number 5</description>
     </key>
 
   </schema>
