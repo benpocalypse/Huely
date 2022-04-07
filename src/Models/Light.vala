@@ -136,7 +136,7 @@ public class Huely.Light : Object
             Idle.add((owned) callback);
             return true;
         };
-        new Thread<bool>("light-connect-thread", run);
+        new Thread<bool>("light-connect-thread", (owned)run);
 
         yield;
 
@@ -183,7 +183,7 @@ public class Huely.Light : Object
             Idle.add((owned) callback);
             return true;
         };
-        new Thread<bool>("light-get-protocol-thread", run);
+        new Thread<bool>("light-get-protocol-thread", (owned)run);
 
         yield;
         return result;
@@ -246,7 +246,7 @@ public class Huely.Light : Object
             Idle.add((owned) callback);
             return true;
         };
-        new Thread<bool>("light-refresh-thread", run);
+        new Thread<bool>("light-refresh-thread", (owned)run);
 
         yield;
 

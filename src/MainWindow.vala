@@ -87,8 +87,8 @@ namespace Huely {
         }
 
         // Layout.
-        private LightView lightView = new LightView ();
         private Gtk.ScrolledWindow aboutScrolledWindow = new Gtk.ScrolledWindow (null, null);
+        private Huely.LightViewModel _lightViewModel = new Huely.LightViewModel ();
 
         private void CreateInitialLayout ()
         {
@@ -129,18 +129,14 @@ namespace Huely {
 
                 Hdy.Leaflet leaf2 = new Hdy.Leaflet();
 
-                Gtk.ScrolledWindow scrolledWindow = new Gtk.ScrolledWindow (null, null);
-                scrolledWindow.valign = Gtk.Align.FILL;
-                scrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
-                scrolledWindow.width_request = 250;
-                scrolledWindow.add (lightView);
+                Huely.LightPaneView lightPane = new Huely.LightPaneView (_lightViewModel);
 
                 Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
                 backButton.clicked.connect (() =>
                 {
                     leaf1.set_visible_child (headrbar1);
-                    leaf2.set_visible_child (scrolledWindow);
-                    lightView.unselect_all ();
+                    leaf2.set_visible_child (lightPane);
+                    lightPane.UnselectAll ();
                 });
 
                 Gtk.Button settingsButtonRight = new Gtk.Button.from_icon_name ("emblem-system-symbolic");
@@ -271,6 +267,7 @@ namespace Huely {
                 setButton.label = "Set";
                 setButton.clicked.connect (() =>
                 {
+                    /*
                     if (lightView.get_selected_row () != null)
                     {
                         var row = ((LightListBoxRow)lightView.get_selected_row ());
@@ -292,10 +289,12 @@ namespace Huely {
                         row.light.SetColor (red, green, blue);
                         row.light.SetBrightness (row.light.Brightness);
                     }
+                    */
                 });
 
                 setButton.set_sensitive (false);
 
+                /*
                 lightView.row_selected.connect ((row) =>
                 {
                     if (row != null)
@@ -309,6 +308,7 @@ namespace Huely {
                         chooser.ChooseColor (lightRow.light.Color);
                     }
                 });
+                */
 
                 contentBox.pack_start (setButton, false, false);
 
@@ -329,13 +329,9 @@ namespace Huely {
                     spinnerBox.add (spinner);
                     spinnerBox.add (spinnerLabel);
 
-                    scrolledWindow.remove (lightView);
-                    scrolledWindow.add (spinnerBox);
-                    scrolledWindow.show_all ();
-                    spinner.start ();
+                    lightPane.DisplaySearchingForLights ();
 
                     debug ("Searching for lights...\n");
-                    lightView.clear ();
 
                     LightDiscovery dl = new LightDiscovery ();
                     ObservableList<Huely.Light> lights = new ObservableList<Huely.Light> ();
@@ -348,20 +344,19 @@ namespace Huely {
                     });
                     loop.run();
 
-                    lightView.clear ();
-                    lightView.add_lights (lights.data);
-                    lightView.show_all();
+                    // TODO - We might not want to just clear the list. Maybe
+                    // in the future only add newly discovered lights to the
+                    // existing list?
+                    _lightViewModel.Lights.clear ();
 
-                    spinner.stop ();
-                    scrolledWindow.remove (spinnerBox);
-                    scrolledWindow.add (lightView);
-                    scrolledWindow.show_all ();
+                    _lightViewModel.Lights.add_all (lights.data);
+                    lightPane.DisplayLightList ();
                 });
 
                 headrbar1.pack_start (searchButton);
                 headrbar1.pack_end (settingsButtonLeft);
 
-                leaf2.add (scrolledWindow);
+                leaf2.add (lightPane);
                 leaf2.add (contentBox);
                 leaf2.valign = Gtk.Align.FILL;
 
@@ -399,7 +394,7 @@ namespace Huely {
                 // These sizegroups in combination with the leaflets are what make the adaptive magic happen.
                 Gtk.SizeGroup sizegroup1 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
                 sizegroup1.add_widget (headrbar1);
-                sizegroup1.add_widget (scrolledWindow);
+                sizegroup1.add_widget (lightPane);
 
                 Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
                 sizegroup3.add_widget (headrbar2);
@@ -418,7 +413,7 @@ namespace Huely {
                 Idle.add((owned) callback);
                 return true;
             };
-            new Thread<bool>("create-layout-thread", run);
+            new Thread<bool>("create-layout-thread", (owned)run);
 
             yield;
 
@@ -482,7 +477,7 @@ namespace Huely {
 
                 debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
 
-                lightView.ViewModel.Lights.add (
+                _lightViewModel.Lights.add (
                     new Huely.Light.with_ip_and_name_and_color_and_brightness (
                         lightIp,
                         lightName,
@@ -492,7 +487,6 @@ namespace Huely {
                         (uint8)(int.parse(brightness))
                         )
                     );
-                lightView.show_all ();
             }
 
             default_width = rect.width;
@@ -541,25 +535,26 @@ namespace Huely {
             get_position (out x, out y);
             Huely.saved_state.set ("window-position", "(ii)", x, y);
 
-            var numLights = ((int)lightView.ViewModel.Lights.length ());
+
+            var numLights = ((int)_lightViewModel.Lights.length ());
             Huely.saved_state.set ("num-lights", "i", numLights);
 
             for (int i = 0; i < numLights; i++)
             {
                 Gdk.RGBA color = Gdk.RGBA ();
                 color.parse ("#" +
-                    lightView.ViewModel.Lights[i].Red.to_string ("%x") +
-                    lightView.ViewModel.Lights[i].Green.to_string ("%x") +
-                    lightView.ViewModel.Lights[i].Blue.to_string ("%x")
+                    _lightViewModel.Lights[i].Red.to_string ("%x") +
+                    _lightViewModel.Lights[i].Green.to_string ("%x") +
+                    _lightViewModel.Lights[i].Blue.to_string ("%x")
                     );
 
-                Huely.saved_state.set_value (@"light-name-$(i+1)", lightView.ViewModel.Lights[i].Name);
-                Huely.saved_state.set_value (@"light-ip-$(i+1)", lightView.ViewModel.Lights[i].IpAddress);
+                Huely.saved_state.set_value (@"light-name-$(i+1)", _lightViewModel.Lights[i].Name);
+                Huely.saved_state.set_value (@"light-ip-$(i+1)", _lightViewModel.Lights[i].IpAddress);
                 Huely.saved_state.set_value (@"light-color-$(i+1)", "#" +
-                    lightView.ViewModel.Lights[i].Red.to_string ("%x") +
-                    lightView.ViewModel.Lights[i].Green.to_string ("%x") +
-                    lightView.ViewModel.Lights[i].Blue.to_string ("%x"));
-                Huely.saved_state.set_value (@"light-brightness-$(i+1)", lightView.ViewModel.Lights[i].Brightness.to_string ());
+                    _lightViewModel.Lights[i].Red.to_string ("%x") +
+                    _lightViewModel.Lights[i].Green.to_string ("%x") +
+                    _lightViewModel.Lights[i].Blue.to_string ("%x"));
+                Huely.saved_state.set_value (@"light-brightness-$(i+1)", _lightViewModel.Lights[i].Brightness.to_string ());
             }
         }
 
@@ -601,7 +596,6 @@ namespace Huely {
         }
 
         // Graceful shutdown.
-
         public bool quit_gracefully ()
         {
             action_quit ();

@@ -46,7 +46,7 @@ public class Huely.LightDiscovery : GLib.Object
             Idle.add((owned) callback);
             return true;
         };
-        new Thread<bool>("discover-lights-thread", run);
+        new Thread<bool>("discover-lights-thread", (owned)run);
 
         // Wait for background thread to schedule our callback
         yield;

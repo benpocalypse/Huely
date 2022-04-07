@@ -2,7 +2,7 @@ project(
     'com.github.benpocalypse.Huely',
     'vala',
     'c',
-    version: '0.3.0'
+    version: '0.4.0'
 )
 
 i18n = import('i18n')
@@ -34,12 +34,14 @@ executable(
     meson.project_name(),
     gresource,
     'src' / 'Application.vala',
+    'src' / 'Interfaces/IPaneView.vala',
     'src' / 'MainWindow.vala',
     'src' / 'Models' / 'Light.vala',
     'src' / 'Utilities' / 'LightDiscovery.vala',
     'src' / 'Utilities' / 'ObservableList.vala',
     'src' / 'ViewModels' / 'LightViewModel.vala',
-    'src' / 'Views' / 'LightView.vala',
+    'src' / 'Views' / 'LightPaneView.vala',
+    'src' / 'Views' / 'LightViewListBox.vala',
     'src' / 'Widgets' / 'LightListBoxRow.vala',
     'src' / 'Widgets' / 'ColorChooser.vala',
     'src' / 'Widgets' / 'ColorGridButton.vala',

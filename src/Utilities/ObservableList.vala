@@ -61,7 +61,7 @@ public class Huely.ObservableList<T> : Object, ListModel
 
     Type get_item_type ()
     {
-            return typeof (T);
+        return typeof (T);
     }
 
     uint get_n_items ()
