@@ -129,7 +129,8 @@ namespace Huely {
 
                 Hdy.Leaflet leaf2 = new Hdy.Leaflet();
 
-                Huely.LightPaneView lightPane = new Huely.LightPaneView (_lightViewModel);
+                Huely.LightListPane lightPane = new Huely.LightListPane (_lightViewModel);
+                Huely.LightDetailsPane detailsPane = new Huely.LightDetailsPane ();
 
                 Gtk.Button backButton = new Gtk.Button.from_icon_name ("go-previous-symbolic");
                 backButton.clicked.connect (() =>
@@ -164,13 +165,14 @@ namespace Huely {
                 {
                     var childName = leaf2.get_visible_child ().name;
 
-                    if (childName == "GtkScrolledWindow")
+                    // TODO - Figure out a way to abstract this.
+                    if (childName == "HuelyLightListPane")
                     {
                         backButton.visible = false;
                     }
                     else
                     {
-                        if (childName == "GtkBox" && backButton.visible == true)
+                        if (childName == "HuelyLightDetailsPane" && backButton.visible == true)
                         {
                             backButton.visible = false;
                         }
@@ -190,65 +192,6 @@ namespace Huely {
                     }
                 });
 
-                Gtk.Label nameLabel = new Gtk.Label ("Name:");
-                nameLabel.vexpand = false;
-                nameLabel.margin = 12;
-                Gtk.Entry nameEntry = new Gtk.Entry ();
-                nameEntry.set_sensitive (false);
-                nameEntry.vexpand = false;
-                nameEntry.margin = 5;
-                nameEntry.margin_top = 10;
-                Gtk.Box nameBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-                nameBox.vexpand = false;
-                nameBox.add (nameLabel);
-                nameBox.add (nameEntry);
-
-                // TODO - Make a proper palette parser or something. This is ugly.
-                string [] paletteStrings =
-                {
-                    "#6074ab",
-                    "#6b9acf",
-                    "#8bbde6",
-                    "#aae0f3",
-                    "#c8eded",
-                    "#faffe0",
-                    "#dde6e0",
-                    "#b4bec2",
-                    "#949da8",
-                    "#7a7a99",
-                    "#5b5280",
-                    "#4e3161",
-                    "#421e42",
-                    "#612447",
-                    "#7a3757",
-                    "#96485b",
-                    "#bd6868",
-                    "#d18b79",
-                    "#dbac8c",
-                    "#e6cfa1",
-                    "#e7ebbc",
-                    "#b2dba0",
-                    "#87c293",
-                    "#70a18f",
-                    "#637c8f",
-                    "#b56e75",
-                    "#c98f8f",
-                    "#dfb6ae",
-                    "#edd5ca",
-                    "#bd7182",
-                    "#9e5476",
-                    "#753c6a"
-                };
-
-                Gtk.Box contentBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-                contentBox.valign = Gtk.Align.FILL;
-
-                Huely.ColorChooser chooser = new Huely.ColorChooser (3, paletteStrings);
-                chooser.margin = 10;
-
-                contentBox.pack_start (nameBox, false, false);
-                contentBox.pack_start (chooser, false, false);
-
                 leaf2 = new Hdy.Leaflet ();
                 leaf2.set_transition_type (Hdy.LeafletTransitionType.SLIDE);
                 leaf2.transition_type = Hdy.LeafletTransitionType.SLIDE;
@@ -260,75 +203,11 @@ namespace Huely {
 
                 titlebar.add(leaf1);
 
-                Gtk.Button setButton = new Gtk.Button ();
-                setButton.margin_right = 10;
-                setButton.margin_bottom = 10;
-                setButton.halign = Gtk.Align.END;
-                setButton.label = "Set";
-                setButton.clicked.connect (() =>
-                {
-                    /*
-                    if (lightView.get_selected_row () != null)
-                    {
-                        var row = ((LightListBoxRow)lightView.get_selected_row ());
-
-                        var rgba = chooser.SelectedColor;
-                        uint8 red = ((uint8)(rgba.red * 255));
-                        uint8 green = ((uint8)(rgba.green * 255));
-                        uint8 blue = ((uint8)(rgba.blue * 255));
-
-                        var loop = new MainLoop();
-                        row.light.ConnectAsync.begin((obj, res) =>
-                        {
-                            row.light.ConnectAsync.end (res);
-                            loop.quit();
-                        });
-                        loop.run();
-
-                        row.set_name (nameEntry.text);
-                        row.light.SetColor (red, green, blue);
-                        row.light.SetBrightness (row.light.Brightness);
-                    }
-                    */
-                });
-
-                setButton.set_sensitive (false);
-
-                /*
-                lightView.row_selected.connect ((row) =>
-                {
-                    if (row != null)
-                    {
-                        var lightRow = ((LightListBoxRow)row);
-                        nameEntry.text = lightRow.LightName;
-                        setButton.set_sensitive (true);
-                        nameEntry.set_sensitive (true);
-                        leaf1.set_visible_child (headrbar2);
-                        leaf2.set_visible_child (contentBox);
-                        chooser.ChooseColor (lightRow.light.Color);
-                    }
-                });
-                */
-
-                contentBox.pack_start (setButton, false, false);
-
                 var searchButton = new Gtk.Button.from_icon_name ("view-refresh-symbolic");
                 searchButton.margin = 5;
 
                 searchButton.clicked.connect (() =>
                 {
-                    Gtk.Box spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-                    spinnerBox.valign = Gtk.Align.CENTER;
-                    Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
-
-                    Gtk.Spinner spinner = new Gtk.Spinner ();
-                    spinner.margin = 10;
-                    spinner.width_request = 32;
-                    spinner.height_request = 32;
-
-                    spinnerBox.add (spinner);
-                    spinnerBox.add (spinnerLabel);
-
                     lightPane.DisplaySearchingForLights ();
 
                     debug ("Searching for lights...\n");
@@ -353,11 +232,18 @@ namespace Huely {
                     lightPane.DisplayLightList ();
                 });
 
+                lightPane.LightSelected.connect ((light) =>
+                {
+                    detailsPane.LightSelected (light);
+                    leaf1.set_visible_child (headrbar2);
+                    leaf2.set_visible_child (detailsPane);
+                });
+
                 headrbar1.pack_start (searchButton);
                 headrbar1.pack_end (settingsButtonLeft);
 
                 leaf2.add (lightPane);
-                leaf2.add (contentBox);
+                leaf2.add (detailsPane);
                 leaf2.valign = Gtk.Align.FILL;
 
                 // About Deck
@@ -398,7 +284,7 @@ namespace Huely {
 
                 Gtk.SizeGroup sizegroup3 = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
                 sizegroup3.add_widget (headrbar2);
-                sizegroup3.add_widget (contentBox);
+                sizegroup3.add_widget (detailsPane);
 
                 mainBox.pack_start (titlebar, false, false);
                 mainBox.pack_start (leaf2, true, true);

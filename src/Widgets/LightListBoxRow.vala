@@ -1,4 +1,4 @@
-public class LightListBoxRow : Gtk.ListBoxRow
+public class Huely.LightListBoxRow : Gtk.ListBoxRow
 {
     public string LightName
     {
@@ -8,13 +8,13 @@ public class LightListBoxRow : Gtk.ListBoxRow
     public Gtk.Label _lightName;
     private Gtk.Label _ipAddress;
 
-    public Huely.Light? light { get; set; }
+    public Huely.Light? Light { get; set; }
 
     construct
     {
-        if (this.light != null)
+        if (this.Light != null)
         {
-            this.light.bind_property (
+            this.Light.bind_property (
                 "Name",
                 this._lightName,
                 "label",
@@ -25,7 +25,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
     public LightListBoxRow.with_light (Huely.Light light)
     {
-        this.light = light;
+        this.Light = light;
 
         _lightName  = new Gtk.Label (light.Name)
         {
@@ -62,11 +62,11 @@ public class LightListBoxRow : Gtk.ListBoxRow
         brightnessScale.margin_left = 10;
         brightnessScale.margin_right = 10;
         brightnessScale.set_draw_value (false);
-        brightnessScale.set_value (light.Brightness);
+        brightnessScale.set_value (Light.Brightness);
 
         brightnessScale.button_release_event.connect ((val) =>
         {
-            light.SetBrightness (brightnessScale.get_value()); //(val.get_value ());
+            Light.SetBrightness (brightnessScale.get_value()); //(val.get_value ());
             return base.button_release_event (val);
         });
 
@@ -75,15 +75,15 @@ public class LightListBoxRow : Gtk.ListBoxRow
         colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
         colorButton.margin = 10;
         colorButton.halign = Gtk.Align.END;
-        colorButton.set_active(light.IsOn);
+        colorButton.set_active(Light.IsOn);
 
         colorButton.toggled.connect (() =>
         {
-            light.set_state (colorButton.get_active());
+            Light.set_state (colorButton.get_active());
         });
 
         var connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
-        if (light.IsConnected == true)
+        if (Light.IsConnected == true)
         {
             connectedIcon = new Gtk.Image.from_icon_name ("network-wireless-signal-excellent-symbolic", Gtk.IconSize.BUTTON);
         }
@@ -93,7 +93,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
         }
 
         Gdk.RGBA parser = Gdk.RGBA ();
-        parser.parse ("#" + light.Red.to_string ("%x") + light.Green.to_string ("%x") + light.Blue.to_string ("%x"));
+        parser.parse ("#" + Light.Red.to_string ("%x") + Light.Green.to_string ("%x") + Light.Blue.to_string ("%x"));
 
         Huely.ColorGridButton lightColorButton = new Huely.ColorGridButton.without_icon ();
         lightColorButton.Color = parser;
@@ -106,14 +106,14 @@ public class LightListBoxRow : Gtk.ListBoxRow
 
         light.notify.connect (() =>
         {
-            colorButton.set_active(light.IsOn);
+            colorButton.set_active(Light.IsOn);
 
-            parser.parse ("#" + light.Red.to_string ("%x") + light.Green.to_string ("%x") + light.Blue.to_string ("%x"));
+            parser.parse ("#" + Light.Red.to_string ("%x") + Light.Green.to_string ("%x") + Light.Blue.to_string ("%x"));
             lightColorButton.Color = parser;
 
-            brightnessScale.set_value (light.Brightness);
+            brightnessScale.set_value (Light.Brightness);
 
-            if (light.IsConnected == true)
+            if (Light.IsConnected == true)
             {
                 connectedIcon = new Gtk.Image.from_icon_name ("network-wireless-signal-excellent-symbolic", Gtk.IconSize.BUTTON);
             }
@@ -129,7 +129,23 @@ public class LightListBoxRow : Gtk.ListBoxRow
         _horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
         _horizontalBox.pack_start (connectedIcon, false, false, 0);
         _horizontalBox.pack_start (lightColorButton, false, false, 0);
-        _horizontalBox.pack_end (colorButton, false, false, 0);
+        //_horizontalBox.pack_end (colorButton, false, false, 0);
+
+        var onOffSwitch = new Gtk.Switch ();
+        onOffSwitch.margin = 5;
+
+        onOffSwitch.set_state (Light.IsOn);
+
+        onOffSwitch.state_set.connect ((val) =>
+        {
+            Light.set_state (val);
+            onOffSwitch.active = val;
+
+            return val;
+        });
+
+        //onOffSwitchStyle.add_class (Granite.STYLE_CLASS_MODE_SWITCH);
+        _horizontalBox.pack_end (onOffSwitch, false, false, 0);
 
         _verticalBoxOuter.add (_horizontalBox);
         _verticalBoxOuter.add (brightnessScale);
@@ -140,7 +156,7 @@ public class LightListBoxRow : Gtk.ListBoxRow
     public void set_name (string name)
     {
         _lightName.set_label (name);
-        light.Name = name;
+        Light.Name = name;
     }
 
     public void set_ip_address (string ipAddress)

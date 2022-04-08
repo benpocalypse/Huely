@@ -1,4 +1,4 @@
-public class Huely.LightPaneView : Gtk.ScrolledWindow, Huely.IPaneView
+public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 {
     private Huely.LightViewModel _viewModel
     {
@@ -17,14 +17,20 @@ public class Huely.LightPaneView : Gtk.ScrolledWindow, Huely.IPaneView
         this.width_request = 250;
     }
 
-    public LightPaneView(Huely.LightViewModel viewModel)
+    public LightListPane(Huely.LightViewModel viewModel)
     {
         _lightViewList = new Huely.LightViewListBox (viewModel);
+        _lightViewList.row_selected.connect ((row) =>
+        {
+            LightSelected (((Huely.LightListBoxRow)row).Light);
+        });
         this.add (_lightViewList);
 
         // TODO - If the ViewModel doesn't contain lights, perhaps
         // show a nice "onboarding" display explaining how to search
-        // for lights.
+        // for lights. Or should that be handled by the main Window
+        // and the left pane should be replaced with a different view,
+        // outside of this one? Not sure yet.
     }
 
     public void UnselectAll ()
@@ -37,7 +43,7 @@ public class Huely.LightPaneView : Gtk.ScrolledWindow, Huely.IPaneView
         return
             ((LightListBoxRow)_lightViewList.get_selected_row ()) == null ?
                 null :
-                ((LightListBoxRow)_lightViewList.get_selected_row ()).light;
+                ((LightListBoxRow)_lightViewList.get_selected_row ()).Light;
     }
 
     public void DisplaySearchingForLights ()
