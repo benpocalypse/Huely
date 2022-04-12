@@ -7,7 +7,8 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
     }
     public Gtk.Label _lightName;
     private Gtk.Label _ipAddress;
-
+    private Gtk.Revealer _checkboxRevealer;
+    private Gtk.CheckButton _checkButton = new Gtk.CheckButton ();
     public Huely.Light? Light { get; set; }
 
     construct
@@ -21,6 +22,8 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
                 BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE
             );
         }
+
+        _checkboxRevealer = new Gtk.Revealer ();
     }
 
     public LightListBoxRow.with_light (Huely.Light light)
@@ -66,7 +69,7 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
 
         brightnessScale.button_release_event.connect ((val) =>
         {
-            Light.SetBrightness (brightnessScale.get_value()); //(val.get_value ());
+            Light.SetBrightness (brightnessScale.get_value());
             return base.button_release_event (val);
         });
 
@@ -121,37 +124,22 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
             {
                 connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
             }
-
-            //this.show_all ();
         });
 
-        Gtk.CheckButton checkButton = new Gtk.CheckButton ();
-        checkButton.sensitive = false;
-        checkButton.set_active (false);
-        //checkButton.hide ();
+        //Gtk.CheckButton checkButton = new Gtk.CheckButton ();
+        _checkButton.sensitive = false;
+        _checkButton.margin_left = 10;
+        _checkButton.set_active (false);
 
-        Gtk.GestureLongPress glp = new Gtk.GestureLongPress (this);
-        glp.propagation_phase = Gtk.PropagationPhase.TARGET;
-        //glp.delay_factor = 1.0d;
-        glp.pressed.connect (() =>
-        {
-            print (@"Long pressed!!\n");
-            checkButton.set_active (true);
-            LightName = ("Checked");
-        });
+        _checkboxRevealer.add (_checkButton);
+        _checkboxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
+        _checkboxRevealer.set_reveal_child (false);
 
-        glp.cancelled.connect (() =>
-        {
-            print (@"Long press cancelled!!\n");
-            LightName = ("Cancelled");
-        });
-
-        _horizontalBox.pack_start (checkButton, false, false, 0);
+        _horizontalBox.pack_start (_checkboxRevealer, false, false, 0);
         _horizontalBox.pack_start (_verticalBoxInner, false, false, 0);
         _horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
         _horizontalBox.pack_start (connectedIcon, false, false, 0);
         _horizontalBox.pack_start (lightColorButton, false, false, 0);
-        //_horizontalBox.pack_end (colorButton, false, false, 0);
 
         var onOffSwitch = new Gtk.Switch ();
         onOffSwitch.margin = 5;
@@ -173,6 +161,23 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         _verticalBoxOuter.add (brightnessScale);
 
         add (_verticalBoxOuter);
+        this.show_all ();
+    }
+
+    public void LongPressed ()
+    {
+        var revealDirection = _checkboxRevealer.get_reveal_child ();
+
+        _checkboxRevealer.set_transition_type (
+            revealDirection == false ?
+                Gtk.RevealerTransitionType.SLIDE_RIGHT :
+                Gtk.RevealerTransitionType.SLIDE_LEFT);
+
+        _checkButton.set_active (!_checkButton.get_active ());
+
+        _checkboxRevealer.set_reveal_child (!_checkboxRevealer.get_reveal_child ());
+        //_checkButton.set_active (!_checkButton.get_active ());
+        this.activate ();
     }
 
     public void set_name (string name)
