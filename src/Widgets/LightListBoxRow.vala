@@ -122,9 +122,31 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
                 connectedIcon = new Gtk.Image.from_icon_name ("network-cellular-offline-symbolic", Gtk.IconSize.BUTTON);
             }
 
-            this.show_all ();
+            //this.show_all ();
         });
 
+        Gtk.CheckButton checkButton = new Gtk.CheckButton ();
+        checkButton.sensitive = false;
+        checkButton.set_active (false);
+        //checkButton.hide ();
+
+        Gtk.GestureLongPress glp = new Gtk.GestureLongPress (this);
+        glp.propagation_phase = Gtk.PropagationPhase.TARGET;
+        //glp.delay_factor = 1.0d;
+        glp.pressed.connect (() =>
+        {
+            print (@"Long pressed!!\n");
+            checkButton.set_active (true);
+            LightName = ("Checked");
+        });
+
+        glp.cancelled.connect (() =>
+        {
+            print (@"Long press cancelled!!\n");
+            LightName = ("Cancelled");
+        });
+
+        _horizontalBox.pack_start (checkButton, false, false, 0);
         _horizontalBox.pack_start (_verticalBoxInner, false, false, 0);
         _horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
         _horizontalBox.pack_start (connectedIcon, false, false, 0);
