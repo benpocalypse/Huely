@@ -40,6 +40,7 @@ public class Huely.Light : Object
         try
         {
             _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+            _socket.set_timeout (1);
 
             var loop = new MainLoop();
             this.ConnectAsync.begin((obj, res) =>
@@ -67,9 +68,11 @@ public class Huely.Light : Object
         Blue = blue;
         Brightness = brightness;
 
+/*
         try
         {
             _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+            _socket.set_timeout (1);
 
             var loop = new MainLoop();
             this.ConnectAsync.begin((obj, res) =>
@@ -85,6 +88,7 @@ public class Huely.Light : Object
         {
             print (@"Encountered error constrtucting new Light: $(ex.message)\n");
         }
+*/
     }
 
     // Communications functions

@@ -346,6 +346,20 @@ namespace Huely {
 
         private void restore_window_state ()
         {
+            for (int i = 1; i < 6; i++)
+            {
+                _lightViewModel.Lights.add (
+                        new Huely.Light.with_ip_and_name_and_color_and_brightness (
+                            @"192.168.1.$(i)",
+                            @"Light $(i)",
+                            ((uint8)(0)),
+                            ((uint8)(0)),
+                            ((uint8)(0)),
+                            (uint8)(0)
+                            )
+                        );
+            }
+
         /*
             var rect = Gdk.Rectangle ();
             Huely.saved_state.get ("window-size", "(ii)", out rect.width, out rect.height);
