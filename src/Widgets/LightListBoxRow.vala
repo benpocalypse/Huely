@@ -33,7 +33,7 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         _lightName  = new Gtk.Label (light.Name)
         {
             halign = Gtk.Align.START,
-            margin_left = 12,
+            margin_left = 5,
             margin_top = 5,
             margin_right = 12
         };
@@ -47,10 +47,11 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
             margin_bottom = 3
         };
 
-        Gtk.Box _verticalBoxInner = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        _verticalBoxInner.halign = Gtk.Align.START;
-        Gtk.Box _verticalBoxOuter = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        Gtk.Box _horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        Gtk.Box verticalBoxInner = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        verticalBoxInner.halign = Gtk.Align.START;
+        Gtk.Box verticalBoxOuter = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        Gtk.Box horizontalBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        Gtk.Box horizontalBoxOuter = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
         Gtk.StyleContext context = new Gtk.StyleContext ();
         Pango.FontDescription font = context.get_font (Gtk.StateFlags.NORMAL);
@@ -58,8 +59,8 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         font.set_style (Pango.Style.ITALIC);
         _ipAddress.override_font (font);
 
-        _verticalBoxInner.add (_lightName);
-        _verticalBoxInner.add (_ipAddress);
+        verticalBoxInner.add (_lightName);
+        verticalBoxInner.add (_ipAddress);
 
         Gtk.Scale brightnessScale = new Gtk.Scale.with_range (Gtk.Orientation.HORIZONTAL, 0, 100, 1);
         brightnessScale.margin_left = 10;
@@ -135,11 +136,11 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         _checkboxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
         _checkboxRevealer.set_reveal_child (false);
 
-        _horizontalBox.pack_start (_checkboxRevealer, false, false, 0);
-        _horizontalBox.pack_start (_verticalBoxInner, false, false, 0);
-        _horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
-        _horizontalBox.pack_start (connectedIcon, false, false, 0);
-        _horizontalBox.pack_start (lightColorButton, false, false, 0);
+        //horizontalBox.pack_start (_checkboxRevealer, false, false, 0);
+        horizontalBox.pack_start (lightColorButton, false, false, 0);
+        horizontalBox.pack_start (verticalBoxInner, false, false, 0);
+        horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
+        horizontalBox.pack_start (connectedIcon, false, false, 0);
 
         var onOffSwitch = new Gtk.Switch ();
         onOffSwitch.margin = 5;
@@ -155,12 +156,15 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         });
 
         //onOffSwitchStyle.add_class (Granite.STYLE_CLASS_MODE_SWITCH);
-        _horizontalBox.pack_end (onOffSwitch, false, false, 0);
+        horizontalBox.pack_end (onOffSwitch, false, false, 0);
 
-        _verticalBoxOuter.add (_horizontalBox);
-        _verticalBoxOuter.add (brightnessScale);
+        verticalBoxOuter.add (horizontalBox);
+        verticalBoxOuter.add (brightnessScale);
 
-        add (_verticalBoxOuter);
+        horizontalBoxOuter.pack_start (_checkboxRevealer, false, false, 0);
+        horizontalBoxOuter.pack_start (verticalBoxOuter, true, true, 0);
+
+        add (horizontalBoxOuter);
         this.show_all ();
     }
 
@@ -177,7 +181,19 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
 
         _checkboxRevealer.set_reveal_child (!_checkboxRevealer.get_reveal_child ());
         //_checkButton.set_active (!_checkButton.get_active ());
-        this.activate ();
+        //this.activate ();
+    }
+
+    public override bool button_release_event (Gdk.EventButton event)
+    {
+        print ("Button released!\n");
+        return true;
+    }
+
+    public override bool key_release_event (Gdk.EventKey event)
+    {
+        print ("Key released!\n");
+        return true;
     }
 
     public void set_name (string name)

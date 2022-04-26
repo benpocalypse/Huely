@@ -17,12 +17,19 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         this.width_request = 250;
     }
 
-    public LightListPane(Huely.LightViewModel viewModel)
+    public LightListPane (Huely.LightViewModel viewModel)
     {
         _lightViewList = new Huely.LightViewListBox (viewModel);
         _lightViewList.row_selected.connect ((row) =>
         {
-            LightSelected (((Huely.LightListBoxRow)row).Light);
+            // FIXME - This is what causes the light row to be selected after
+            //         the long press happens. Maybe add a bool here to check
+            //         to see what the source of selection is?
+
+            if (_lightViewList.FromLongPress == false)
+            {
+                LightSelected (((Huely.LightListBoxRow)row).Light);
+            }
         });
         this.add (_lightViewList);
 
