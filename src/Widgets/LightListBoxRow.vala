@@ -9,6 +9,7 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
     private Gtk.Label _ipAddress;
     private Gtk.Revealer _checkboxRevealer;
     private Gtk.CheckButton _checkButton = new Gtk.CheckButton ();
+    public bool IsChecked { get; set; }
     public Huely.Light? Light { get; set; }
 
     construct
@@ -24,6 +25,7 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         }
 
         _checkboxRevealer = new Gtk.Revealer ();
+        IsChecked = false;
     }
 
     public LightListBoxRow.with_light (Huely.Light light)
@@ -127,7 +129,6 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
             }
         });
 
-        //Gtk.CheckButton checkButton = new Gtk.CheckButton ();
         _checkButton.sensitive = false;
         _checkButton.margin_left = 10;
         _checkButton.set_active (false);
@@ -136,7 +137,6 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
         _checkboxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_LEFT);
         _checkboxRevealer.set_reveal_child (false);
 
-        //horizontalBox.pack_start (_checkboxRevealer, false, false, 0);
         horizontalBox.pack_start (lightColorButton, false, false, 0);
         horizontalBox.pack_start (verticalBoxInner, false, false, 0);
         horizontalBox.pack_start (new Gtk.Label (""), true, true, 0); // Filler to pad out the row horizontally.
@@ -155,7 +155,6 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
             return val;
         });
 
-        //onOffSwitchStyle.add_class (Granite.STYLE_CLASS_MODE_SWITCH);
         horizontalBox.pack_end (onOffSwitch, false, false, 0);
 
         verticalBoxOuter.add (horizontalBox);
@@ -178,22 +177,8 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
                 Gtk.RevealerTransitionType.SLIDE_LEFT);
 
         _checkButton.set_active (!_checkButton.get_active ());
-
         _checkboxRevealer.set_reveal_child (!_checkboxRevealer.get_reveal_child ());
-        //_checkButton.set_active (!_checkButton.get_active ());
-        //this.activate ();
-    }
-
-    public override bool button_release_event (Gdk.EventButton event)
-    {
-        print ("Button released!\n");
-        return true;
-    }
-
-    public override bool key_release_event (Gdk.EventKey event)
-    {
-        print ("Key released!\n");
-        return true;
+        IsChecked = _checkButton.active;
     }
 
     public void set_name (string name)

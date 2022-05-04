@@ -10,6 +10,7 @@ public class Huely.LightViewListBox : Gtk.ListBox
     private Gtk.GestureLongPress glp;
 
     public bool FromLongPress = false;
+    public int NumberOfLightsSelected = 0;
 
     public LightViewListBox (Huely.LightViewModel viewModel)
     {
@@ -31,7 +32,6 @@ public class Huely.LightViewListBox : Gtk.ListBox
         glp = new Gtk.GestureLongPress (this);
 
         glp.propagation_phase = Gtk.PropagationPhase.TARGET;
-        //glp.delay_factor = 1.0d;
         glp.pressed.connect ((x, y) =>
         {
             var row = ((Huely.LightListBoxRow)this.get_row_at_y ((int)y));
@@ -43,6 +43,16 @@ public class Huely.LightViewListBox : Gtk.ListBox
                 print (@"Clicked!\n");
                 FromLongPress = true;
                 row.LongPressed ();
+
+                if (row.IsChecked == true)
+                {
+                    NumberOfLightsSelected++;
+                }
+                else
+                {
+                    NumberOfLightsSelected--;
+                }
+
                 this.unselect_all ();
             }
         });
@@ -57,21 +67,6 @@ public class Huely.LightViewListBox : Gtk.ListBox
     {
         print ("row_selected!!\n");
         FromLongPress = false;
-    }
-
-    public override void row_activated (Gtk.ListBoxRow row)
-    {
-        print ("row_activated!!\n");
-    }
-
-    public override void selected_rows_changed ()
-    {
-        print ("selected_rows_changed!!\n");
-    }
-
-    public override void activate_cursor_row ()
-    {
-        print ("activate_cursor_row!!\n");
     }
 }
 
