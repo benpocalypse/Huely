@@ -7,7 +7,7 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
     }
     public Gtk.Label _lightName;
     private Gtk.Label _ipAddress;
-    private Gtk.Revealer _checkboxRevealer;
+    private Gtk.Revealer _checkboxRevealer = new Gtk.Revealer ();
     private Gtk.CheckButton _checkButton = new Gtk.CheckButton ();
     public bool IsChecked { get; set; }
     public Huely.Light? Light { get; set; }
@@ -24,7 +24,6 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
             );
         }
 
-        _checkboxRevealer = new Gtk.Revealer ();
         IsChecked = false;
     }
 
@@ -169,10 +168,8 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
 
     public void LongPressed ()
     {
-        var revealDirection = _checkboxRevealer.get_reveal_child ();
-
         _checkboxRevealer.set_transition_type (
-            revealDirection == false ?
+            _checkboxRevealer.get_reveal_child () == false ?
                 Gtk.RevealerTransitionType.SLIDE_RIGHT :
                 Gtk.RevealerTransitionType.SLIDE_LEFT);
 

@@ -10,6 +10,8 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
     private Huely.LightViewListBox _lightViewList;
     private Gtk.Box _spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
     private Gtk.Box _lightViewBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+
+    private Gtk.Revealer _actionBoxRevealer = new Gtk.Revealer ();
     private Gtk.Button _deleteLightButton = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
     private Gtk.Button _groupLightButton = new Gtk.Button.from_icon_name ("path-combine-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
 
@@ -18,6 +20,19 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         this.valign = Gtk.Align.FILL;
         this.set_shadow_type (Gtk.ShadowType.IN);
         this.width_request = 250;
+
+        _deleteLightButton.clicked.connect (() =>
+        {
+            print ("Light deleted!\r\n");
+            // FIXME - implement iterator in ObservableList
+            foreach (var light in _viewModel.Lights)
+            {
+                if (light.IsChecked)
+                {
+                    _viewModel.Lights.remove (light);
+                }
+            }
+        });
     }
 
     public LightListPane (Huely.LightViewModel viewModel)
@@ -29,12 +44,23 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             //         the long press happens. Maybe add a bool here to check
             //         to see what the source of selection is?
 
+            _actionBoxRevealer.set_transition_type (
+                _actionBoxRevealer.get_reveal_child () == false ?
+                    Gtk.RevealerTransitionType.SLIDE_DOWN :
+                    Gtk.RevealerTransitionType.SLIDE_UP);
+
             if (_lightViewList.FromLongPress == false)
             {
+                if (_lightViewList.NumberOfLightsSelected == 0)
+                {
+                    _actionBoxRevealer.set_reveal_child (false);
+                }
+
                 LightSelected (((Huely.LightListBoxRow)row).Light);
             }
             else
             {
+                _actionBoxRevealer.set_reveal_child (true);
                 _lightViewList.unselect_all ();
             }
 
@@ -61,8 +87,12 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         buttonBox.pack_start (_deleteLightButton, false, false, 0);
         buttonBox.pack_start (_groupLightButton, false, false, 0);
 
+        _actionBoxRevealer.add (buttonBox);
+        _actionBoxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_UP);
+        _actionBoxRevealer.set_reveal_child (false);
+
         _lightViewBox.pack_start (_lightViewList, true, true, 0);
-        _lightViewBox.pack_end (buttonBox, false, false, 0);
+        _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
 
         this.add (_lightViewBox);
 
