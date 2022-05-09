@@ -49,8 +49,8 @@ executable(
 
     config_header,
     dependencies: [
-      dependency('granite', version: '>=5.2.4'),
       dependency('gtk+-3.0'),
+      dependency('gee-0.8'),
       dependency('libhandy-1', version: '>=0.90.0'),
       meson.get_compiler('vala').find_library('posix')
     ],

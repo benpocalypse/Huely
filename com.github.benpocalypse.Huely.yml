@@ -3,9 +3,6 @@ app-id: com.github.benpocalypse.Huely
 sdk: org.gnome.Sdk
 runtime: org.gnome.Platform
 runtime-version: '41'
-base: io.elementary.BaseApp
-base-version: juno-21.08
-
 command: com.github.benpocalypse.Huely
 
 finish-args:
@@ -18,42 +15,11 @@ finish-args:
   - '--system-talk-name=org.freedesktop.Accounts'
 
 modules:
-  - name: elementary-stylesheet
-    buildsystem: meson
-    sources:
-    - type: git
-      url: https://github.com/elementary/stylesheet.git
-      commit: 3047efbfabe723e0b0f2b8ee3d53bed528be4b14
-    modules:
-    - name: sassc
-      cleanup:
-      - "*"
-      sources:
-      - type: git
-        url: https://github.com/sass/sassc.git
-        tag: 3.6.1
-      - type: script
-        dest-filename: autogen.sh
-        commands:
-        - autoreconf -si
-      modules:
-      - name: libsass
-        cleanup:
-        - "*"
-        sources:
-        - type: git
-          url: https://github.com/sass/libsass.git
-          tag: 3.6.4
-        - type: script
-          dest-filename: autogen.sh
-          commands:
-          - autoreconf -si
-
   - name: Huely
     buildsystem: meson
     sources:
       - type: git
         url: https://github.com/benpocalypse/Huely.git
-        branch: 0.3.0
+        branch: main
  #       commit: a991ec06ede80e5ca49af5971c52c58e2958c0a8
 

@@ -77,7 +77,9 @@ public class Huely.LightListBoxRow : Gtk.ListBoxRow
 
         var colorButton = new Gtk.CheckButton ();
         var colorButtonStyle = colorButton.get_style_context ();
-        colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
+
+        // FIXME - Re-implement this outside of Granite
+        //colorButtonStyle.add_class (Granite.STYLE_CLASS_COLOR_BUTTON);
         colorButton.margin = 10;
         colorButton.halign = Gtk.Align.END;
         colorButton.set_active(Light.IsOn);

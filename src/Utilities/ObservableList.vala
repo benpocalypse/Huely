@@ -1,5 +1,18 @@
 public class Huely.ObservableList<T> : Object, ListModel
 {
+    public bool ForEach(Gee.ForallFunc<T> f)
+    {
+        for (int i = 0; i < data.length (); i++)
+        {
+            if (!f (get(i)))
+            {
+	            return false;
+            }
+        }
+
+        return true;
+    }
+
     public List<T> data = new List<T> ();
 
     public void add (T item)

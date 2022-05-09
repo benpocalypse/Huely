@@ -92,11 +92,11 @@ namespace Huely {
         }
 
         private void use_preferred_color_scheme () {
+            // FIXME - Re-implement this outside of Granite
+            /*
             // Set color scheme of app based on person’s preference.
-            var granite_settings = Granite.Settings.get_default ();
             var gtk_settings = Gtk.Settings.get_default ();
-            gtk_settings.gtk_application_prefer_dark_theme
-                = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+            gtk_settings.gtk_application_prefer_dark_theme = Hdy.ColorScheme.PREFER_LIGHT; //.Settings.ColorScheme.DARK;
 
             // Listen for changes in person’s color scheme settings
             // and update color scheme of app accordingly.
@@ -104,6 +104,7 @@ namespace Huely {
                 gtk_settings.gtk_application_prefer_dark_theme
                     = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
             });
+            */
         }
 
         public static int main (string[] commandline_arguments) {

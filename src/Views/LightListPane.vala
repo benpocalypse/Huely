@@ -20,19 +20,6 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         this.valign = Gtk.Align.FILL;
         this.set_shadow_type (Gtk.ShadowType.IN);
         this.width_request = 250;
-
-        _deleteLightButton.clicked.connect (() =>
-        {
-            print ("Light deleted!\r\n");
-            // FIXME - implement iterator in ObservableList
-            foreach (var light in _viewModel.Lights)
-            {
-                if (light.IsChecked)
-                {
-                    _viewModel.Lights.remove (light);
-                }
-            }
-        });
     }
 
     public LightListPane (Huely.LightViewModel viewModel)
@@ -93,6 +80,20 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
         _lightViewBox.pack_start (_lightViewList, true, true, 0);
         _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
+
+        _deleteLightButton.clicked.connect (() =>
+        {
+            print ("Light deleted!\r\n");
+
+            _lightViewList.@foreach ((row) =>
+            {
+                var lightRow = (LightListBoxRow)row;
+                if (lightRow.IsChecked)
+                {
+                    _lightViewList.remove (row);
+                }
+            });
+        });
 
         this.add (_lightViewBox);
 
