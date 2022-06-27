@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Huely
+Exec=com.github.benpocalypse.Huely
+Icon=com.github.benpocalypse.Huely
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true

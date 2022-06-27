@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-set -eu -o pipefail
-
-task/package
-flatpak run com.github.benpocalypse.Huely
