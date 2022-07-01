@@ -6,3 +6,5 @@ builddir/
 
 # temp files created by elementary OS code
 *~
+
+/subprojects/blueprint-compiler
