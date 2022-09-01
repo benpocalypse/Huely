@@ -13,7 +13,9 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     private Gtk.Revealer _actionBoxRevealer = new Gtk.Revealer ();
     private Gtk.Button _deleteLightButton = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
-    private Gtk.Button _groupLightButton = new Gtk.Button.from_icon_name ("path-combine-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
+
+    // TODO - implement this.
+    //private Gtk.Button _groupLightButton = new Gtk.Button.from_icon_name ("path-combine-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
 
     construct
     {
@@ -60,6 +62,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
                 _deleteLightButton.set_sensitive (false);
             }
 
+            /*
             if (_lightViewList.NumberOfLightsSelected > 1)
             {
                 _groupLightButton.set_sensitive (true);
@@ -68,11 +71,12 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             {
                 _groupLightButton.set_sensitive (false);
             }
+            */
         });
 
         Gtk.Box buttonBox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         buttonBox.pack_start (_deleteLightButton, false, false, 0);
-        buttonBox.pack_start (_groupLightButton, false, false, 0);
+        //buttonBox.pack_start (_groupLightButton, false, false, 0);
 
         _actionBoxRevealer.add (buttonBox);
         _actionBoxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_UP);

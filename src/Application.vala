@@ -92,6 +92,20 @@ namespace Huely {
         }
 
         private void use_preferred_color_scheme () {
+            var gtk_settings = Gtk.Settings.get_default ();
+
+            // TODO - This requires libhandy >= 1.6.0
+            if (gtk_settings.gtk_application_prefer_dark_theme)
+            {
+                gtk_settings.set("gtk-application-prefer-dark-theme", true);
+                //Hdy.StyleManager.get_default ().color_scheme = PREFER_LIGHT;
+            }
+            else
+            {
+               gtk_settings.set("gtk-application-prefer-dark-theme", false);
+               //Hdy.StyleManager.get_default ().color_scheme = PREFER_LIGHT;
+            }
+
             // FIXME - Re-implement this outside of Granite
             /*
             // Set color scheme of app based on person’s preference.
@@ -129,3 +143,4 @@ namespace Huely {
         }
     }
 }
+
