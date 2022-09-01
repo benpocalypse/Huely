@@ -289,6 +289,8 @@ namespace Huely {
                 mainBox.pack_start (titlebar, false, false);
                 mainBox.pack_start (leaf2, true, true);
 
+                lightPane.DisplayOnboarding ();
+
                 aboutScrolledWindow.add (aboutBox);
                 aboutScrolledWindow.valign = Gtk.Align.FILL;
                 aboutScrolledWindow.set_shadow_type (Gtk.ShadowType.IN);
@@ -346,6 +348,7 @@ namespace Huely {
 
         private void restore_window_state ()
         {
+        /*
             for (int i = 1; i < 6; i++)
             {
                 _lightViewModel.Lights.add (
@@ -359,6 +362,7 @@ namespace Huely {
                             )
                         );
             }
+            */
 
         /*
             var rect = Gdk.Rectangle ();
