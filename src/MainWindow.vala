@@ -47,7 +47,7 @@ namespace Huely {
                 application: application,                    // DON’T use in constructors; won’t have been assigned yet.
                 height_request: 500,
                 width_request: 380,
-                hide_titlebar_when_maximized: true,          // FIXME: This does not seem to have an effect. Why not?
+                hide_titlebar_when_maximized: true,
                 icon_name: "com.github.benpocalypse.Huely"
             );
         }
@@ -57,8 +57,6 @@ namespace Huely {
         {
             // Initialise the Handy library.
             // https://gnome.pages.gitlab.gnome.org/libhandy/
-            // (Apps in elementary OS 6 use the Handy library extensions
-            // instead of GTKApplicationWindow, etc., directly.)
             Hdy.init();
 
             // Define acclerators (keyboard shortcuts) for actions.
@@ -163,16 +161,13 @@ namespace Huely {
                 // on the Details pane, and the settings gear on both when size permits.
                 headrGroup.update_decoration_layouts.connect (() =>
                 {
-                    var childName = leaf2.get_visible_child ().name;
-
-                    // TODO - Figure out a way to abstract this.
-                    if (childName == "HuelyLightListPane")
+                    if (leaf2.get_visible_child () is LightListPane)
                     {
                         backButton.visible = false;
                     }
                     else
                     {
-                        if (childName == "HuelyLightDetailsPane" && backButton.visible == true)
+                        if (leaf2.get_visible_child () is LightDetailsPane && backButton.visible == true)
                         {
                             backButton.visible = false;
                         }
@@ -289,7 +284,7 @@ namespace Huely {
                 mainBox.pack_start (titlebar, false, false);
                 mainBox.pack_start (leaf2, true, true);
 
-                lightPane.DisplayOnboarding ();
+                //lightPane.DisplayOnboarding ();
 
                 aboutScrolledWindow.add (aboutBox);
                 aboutScrolledWindow.valign = Gtk.Align.FILL;
@@ -348,7 +343,7 @@ namespace Huely {
 
         private void restore_window_state ()
         {
-        /*
+/*
             for (int i = 1; i < 6; i++)
             {
                 _lightViewModel.Lights.add (
@@ -362,7 +357,7 @@ namespace Huely {
                             )
                         );
             }
-            */
+*/
 
         /*
             var rect = Gdk.Rectangle ();

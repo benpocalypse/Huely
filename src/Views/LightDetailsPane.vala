@@ -6,7 +6,7 @@ public class Huely.LightDetailsPane : Gtk.ScrolledWindow, Huely.IPaneView
     private Gtk.Entry nameEntry = new Gtk.Entry ();
     private Huely.ColorChooser chooser;
 
-    private Gtk.Label doSomething = new Gtk.Label ("Select a light from the list on the left.") {margin = 20};
+    private Gtk.Label _onBoardingLabel = new Gtk.Label ("Select a light from the list on the left.") {margin = 20};
     private bool _noSelection = true;
 
     construct
@@ -97,7 +97,7 @@ public class Huely.LightDetailsPane : Gtk.ScrolledWindow, Huely.IPaneView
         contentBox.pack_start (setButton, false, false);
 
         this.width_request = 250;
-        this.add(doSomething);
+        this.add(_onBoardingLabel);
     }
 
     public void Activate ()
@@ -114,7 +114,7 @@ public class Huely.LightDetailsPane : Gtk.ScrolledWindow, Huely.IPaneView
     {
         if (_noSelection == true)
         {
-            this.remove (doSomething);
+            this.remove (_onBoardingLabel);
             this.add (contentBox);
             _noSelection = false;
         }

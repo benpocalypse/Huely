@@ -8,9 +8,9 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
     }
 
     private Huely.LightViewListBox _lightViewList;
-    private Gtk.Box _spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-    private Gtk.Box _lightViewBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-    private Gtk.Box _onboardingBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+    private Gtk.Box _spinnerBox = null;
+    private Gtk.Box _lightViewBox;
+    private Gtk.Label _onboardingLabel = null;
 
     private Gtk.Revealer _actionBoxRevealer = new Gtk.Revealer ();
     private Gtk.Button _deleteLightButton = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
@@ -83,9 +83,6 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         _actionBoxRevealer.set_transition_type (Gtk.RevealerTransitionType.SLIDE_UP);
         _actionBoxRevealer.set_reveal_child (false);
 
-        _lightViewBox.pack_start (_lightViewList, true, true, 0);
-        _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
-
         _deleteLightButton.clicked.connect (() =>
         {
             print ("Light deleted!\r\n");
@@ -106,13 +103,17 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             _actionBoxRevealer.set_reveal_child (false);
         });
 
-        this.add (_lightViewBox);
-
-        // TODO - If the ViewModel doesn't contain lights, perhaps
-        // show a nice "onboarding" display explaining how to search
-        // for lights. Or should that be handled by the main Window
-        // and the left pane should be replaced with a different view,
-        // outside of this one? Not sure yet.
+        if (viewModel.Lights.length () == 0)
+        {
+            DisplayOnboarding ();
+        }
+        else
+        {
+            _lightViewBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+            _lightViewBox.pack_start (_lightViewList, true, true, 0);
+            _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
+            this.add (_lightViewBox);
+        }
     }
 
     public void UnselectAll ()
@@ -130,12 +131,20 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     public void DisplayOnboarding ()
     {
-        Gtk.Label onboardingLabel = new Gtk.Label ("Press search button to discover lights.");
-        _onboardingBox.add (onboardingLabel);
+        _onboardingLabel = new Gtk.Label ("Press search button to discover lights.") {margin = 10};
 
-        this.remove (_lightViewBox);
-        this.remove (_spinnerBox);
-        this.add (_onboardingBox);
+        if (_lightViewBox != null)
+        {
+            this.remove (_lightViewBox);
+        }
+
+        if (_spinnerBox != null)
+        {
+            this.remove (_spinnerBox);
+        }
+
+        this.add (_onboardingLabel);
+        this.show_all ();
     }
 
     public void DisplaySearchingForLights ()
@@ -152,7 +161,11 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         _spinnerBox.add (spinner);
         _spinnerBox.add (spinnerLabel);
 
-        this.remove (_onboardingBox);
+        if (_onboardingLabel != null)
+        {
+            this.remove (_onboardingLabel);
+        }
+
         this.remove (_lightViewBox);
         this.add (_spinnerBox);
         this.show_all ();
@@ -161,7 +174,11 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     public void DisplayLightList ()
     {
-        this.remove (_onboardingBox);
+        if (_onboardingLabel != null)
+        {
+            this.remove (_onboardingLabel);
+        }
+
         this.remove (_spinnerBox);
         this.add (_lightViewBox);
         this.show_all ();
