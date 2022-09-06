@@ -218,13 +218,25 @@ namespace Huely {
                     });
                     loop.run();
 
+                    debug ("finished searching.\n");
+
                     // TODO - We might not want to just clear the list. Maybe
                     // in the future only add newly discovered lights to the
                     // existing list?
                     _lightViewModel.Lights.clear ();
 
                     _lightViewModel.Lights.add_all (lights.data);
-                    lightPane.DisplayLightList ();
+
+                    if (_lightViewModel.Lights.length () > 0)
+                    {
+                        debug ("Displaying lights list.\n");
+                        lightPane.DisplayLightList ();
+                    }
+                    else
+                    {
+                        // TODO - Make this display "no lights found, try again."
+                        lightPane.DisplayOnboarding ();
+                    }
                 });
 
                 lightPane.LightSelected.connect ((light) =>
@@ -283,8 +295,6 @@ namespace Huely {
 
                 mainBox.pack_start (titlebar, false, false);
                 mainBox.pack_start (leaf2, true, true);
-
-                //lightPane.DisplayOnboarding ();
 
                 aboutScrolledWindow.add (aboutBox);
                 aboutScrolledWindow.valign = Gtk.Align.FILL;
