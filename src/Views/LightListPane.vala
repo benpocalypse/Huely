@@ -10,7 +10,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
     private Huely.LightViewListBox _lightViewList;
     private Gtk.Box _spinnerBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
     private Gtk.Box _lightViewBox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-    private Gtk.Label _onboardingLabel = new Gtk.Label ("Press search button to discover lights.") { margin = 10 };
+    private Gtk.Label _textLabel = new Gtk.Label ("Press search button to discover lights.") { margin = 10 };
 
     private Gtk.Revealer _actionBoxRevealer = new Gtk.Revealer ();
     private Gtk.Button _deleteLightButton = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
@@ -105,7 +105,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
         if (viewModel.Lights.length () == 0)
         {
-            DisplayOnboarding ();
+            DisplayText ();
         }
         else
         {
@@ -128,7 +128,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
                 ((LightListBoxRow)_lightViewList.get_selected_row ()).Light;
     }
 
-    public void DisplayOnboarding ()
+    public void DisplayText (string displayText = "Press search button to discover lights.")
     {
         if (_lightViewBox.get_visible ())
         {
@@ -142,7 +142,9 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             this.remove (_spinnerBox);
         }
 
-        this.add (_onboardingLabel);
+        _textLabel = new Gtk.Label (displayText) { margin = 10 };
+
+        this.add (_textLabel);
         this.show_all ();
     }
 
@@ -159,11 +161,11 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         _spinnerBox.add (spinner);
         _spinnerBox.add (spinnerLabel);
 
-        if (_onboardingLabel.get_visible ())
+        if (_textLabel.get_visible ())
         {
             debug ("Removing onboarding label.\n");
-            _onboardingLabel.set_visible (false);
-            this.remove (_onboardingLabel);
+            _textLabel.set_visible (false);
+            this.remove (_textLabel);
         }
 
         if (_lightViewBox.get_visible ())
@@ -180,11 +182,11 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     public void DisplayLightList ()
     {
-        if (_onboardingLabel.get_visible ())
+        if (_textLabel.get_visible ())
         {
             debug ("Removing onboarding lable.\n");
-            _onboardingLabel.set_visible (false);
-            this.remove (_onboardingLabel);
+            _textLabel.set_visible (false);
+            this.remove (_textLabel);
         }
 
         if (_spinnerBox.get_visible ())

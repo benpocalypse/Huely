@@ -234,8 +234,7 @@ namespace Huely {
                     }
                     else
                     {
-                        // TODO - Make this display "no lights found, try again."
-                        lightPane.DisplayOnboarding ();
+                        lightPane.DisplayText ("No compatible lights found.");
                     }
                 });
 
