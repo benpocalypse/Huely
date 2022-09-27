@@ -27,6 +27,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     public LightListPane (Huely.LightViewModel viewModel)
     {
+        _viewModel = viewModel;
         _lightViewList = new Huely.LightViewListBox (viewModel);
         _lightViewList.row_selected.connect ((row) =>
         {
@@ -93,10 +94,6 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
                 if (lightRow.IsChecked)
                 {
                     _viewModel.Lights.remove (lightRow.Light);
-
-                    // TODO - The notification of the ViewModel being changed
-                    // should negate the need for the below line of code.
-                    _lightViewList.remove (row);
                 }
             });
 

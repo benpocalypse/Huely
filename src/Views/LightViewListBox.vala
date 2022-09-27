@@ -24,11 +24,6 @@ public class Huely.LightViewListBox : Gtk.ListBox
             return new LightListBoxRow.with_light ((Huely.Light) item);
         });
 
-        _viewModel.notify.connect (() =>
-        {
-            this.notify_property ("ViewModel");
-        });
-
         glp = new Gtk.GestureLongPress (this);
 
         glp.propagation_phase = Gtk.PropagationPhase.TARGET;

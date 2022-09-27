@@ -30,6 +30,44 @@ public class Huely.Light : Object
     private GLib.Socket _socket;
     private const uint16 PORT = 5577;
 
+    public Light.from_string (string lightString) throws GLib.Error
+    {
+        var lightTokens = lightString.split (",", 0);
+
+        // TODO - Add more validation. Lots more.
+        if (lightTokens.length < 6)
+        {
+            throw new GLib.Error (Quark.from_string ("invalid-format"), 1, "Invalid light string format specified.");
+        }
+
+        var ip = lightTokens[0];
+        var name = lightTokens[1];
+        var red = uint.parse (lightTokens[2]);
+        var green = uint.parse (lightTokens[3]);
+        var blue = uint.parse (lightTokens[4]);
+        var brightness = uint.parse (lightTokens[5]);
+
+        IsConnected = false;
+        _useChecksum = true;
+        _protocol = LedProtocol.UNKNOWN;
+        IpAddress = ip;
+        Name = name;
+        Red = (uint8)red;
+        Green = (uint8)green;
+        Blue = (uint8)blue;
+        Brightness = (uint8)brightness;
+    }
+
+    public string to_string ()
+    {
+        return IpAddress.to_string () + "," +
+            Name + "," +
+            Red.to_string () + "," +
+            Green.to_string () + "," +
+            Blue.to_string () + "," +
+            Brightness.to_string ();
+    }
+
     public Light.with_ip (string ip)
     {
         IsConnected = false;

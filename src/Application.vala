@@ -22,8 +22,6 @@ namespace Huely {
 
             saved_state = new GLib.Settings ("com.github.benpocalypse.Huely.saved-state");
 
-            saved_state.get_
-
             // Command-line options.
 
             // If your app takes command-line arguments, you can specify it

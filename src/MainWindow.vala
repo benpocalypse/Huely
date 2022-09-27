@@ -352,27 +352,23 @@ namespace Huely {
 
         private void restore_window_state ()
         {
-/*
-            for (int i = 1; i < 6; i++)
-            {
-                _lightViewModel.Lights.add (
-                        new Huely.Light.with_ip_and_name_and_color_and_brightness (
-                            @"192.168.1.$(i)",
-                            @"Light $(i)",
-                            ((uint8)(0)),
-                            ((uint8)(0)),
-                            ((uint8)(0)),
-                            (uint8)(0)
-                            )
-                        );
-            }
-*/
-
-        /*
             var rect = Gdk.Rectangle ();
             Huely.saved_state.get ("window-size", "(ii)", out rect.width, out rect.height);
 
-            var numLights = Huely.saved_state.get_int ("num-lights");
+            var lightStringArray = Huely.saved_state.get_strv ("lights");
+
+            try
+            {
+                foreach (var lightString in lightStringArray)
+                {
+                    _lightViewModel.Lights.add (new Huely.Light.from_string (lightString));
+                }
+            }
+            catch (GLib.Error error)
+            {
+            }
+/*
+            numLights = Huely.saved_state.get ("lights", "a(issss)", out )
 
             for (int i =0; i < numLights; i++)
             {
@@ -397,6 +393,7 @@ namespace Huely {
                         )
                     );
             }
+*/
 
             default_width = rect.width;
             default_height = rect.height;
@@ -416,12 +413,10 @@ namespace Huely {
                     }
                     break;
             }
-            */
         }
 
         private void preserve_window_state ()
         {
-        /*
             // Persist window dimensions and location.
             var state = get_window ().get_state ();
 
@@ -446,28 +441,7 @@ namespace Huely {
             get_position (out x, out y);
             Huely.saved_state.set ("window-position", "(ii)", x, y);
 
-
-            var numLights = ((int)_lightViewModel.Lights.length ());
-            Huely.saved_state.set ("num-lights", "i", numLights);
-
-            for (int i = 0; i < numLights; i++)
-            {
-                Gdk.RGBA color = Gdk.RGBA ();
-                color.parse ("#" +
-                    _lightViewModel.Lights[i].Red.to_string ("%x") +
-                    _lightViewModel.Lights[i].Green.to_string ("%x") +
-                    _lightViewModel.Lights[i].Blue.to_string ("%x")
-                    );
-
-                Huely.saved_state.set_value (@"light-name-$(i+1)", _lightViewModel.Lights[i].Name);
-                Huely.saved_state.set_value (@"light-ip-$(i+1)", _lightViewModel.Lights[i].IpAddress);
-                Huely.saved_state.set_value (@"light-color-$(i+1)", "#" +
-                    _lightViewModel.Lights[i].Red.to_string ("%x") +
-                    _lightViewModel.Lights[i].Green.to_string ("%x") +
-                    _lightViewModel.Lights[i].Blue.to_string ("%x"));
-                Huely.saved_state.set_value (@"light-brightness-$(i+1)", _lightViewModel.Lights[i].Brightness.to_string ());
-            }
-            */
+            Huely.saved_state.set_strv ("lights", _lightViewModel.Lights.to_string_array () );
         }
 
         // Actions.
@@ -488,7 +462,6 @@ namespace Huely {
         }
 
         // Action handlers.
-
         private void action_fullscreen ()
         {
             if (Gdk.WindowState.FULLSCREEN in get_window ().get_state ())

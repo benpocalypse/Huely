@@ -72,6 +72,20 @@ public class Huely.ObservableList<T> : Object, ListModel
         return this[position] as Object;
     }
 
+    public string[] to_string_array ()
+    {
+        //string[] result = new string[(int)length];
+        string[] result = new string[200];
+
+        for (int i = 0; i < length (); i++)
+        {
+            var light = get_item (i) as Huely.Light;
+            result[i] = light.to_string ();
+        }
+
+        return result;
+    }
+
     Type get_item_type ()
     {
         return typeof (T);
