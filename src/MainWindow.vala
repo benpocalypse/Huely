@@ -279,7 +279,7 @@ namespace Huely {
                 aboutBox.pack_start (aboutNameLabel, false, false);
                 aboutBox.pack_start (new Gtk.Label (@"v$(Constants.Config.VERSION)"), false, false);
                 aboutBox.pack_start (aboutWebsiteLabel, false, false, 10);
-                aboutBox.pack_start (new Gtk.Label (@"Color your workspace."), false, false);
+                aboutBox.pack_start (new Gtk.Label (@"Color your space."), false, false);
                 aboutBox.pack_start (new Gtk.Label (@"© Ben Foote"), false, false);
                 aboutBox.pack_end (new Gtk.Label (""), true, true);
 
@@ -366,34 +366,8 @@ namespace Huely {
             }
             catch (GLib.Error error)
             {
+                // TODO - log? or something?
             }
-/*
-            numLights = Huely.saved_state.get ("lights", "a(issss)", out )
-
-            for (int i =0; i < numLights; i++)
-            {
-                string lightName = Huely.saved_state.get_string (@"light-name-$(i+1)");
-                string lightIp = Huely.saved_state.get_string (@"light-ip-$(i+1)");
-                string lightColorString = Huely.saved_state.get_string (@"light-color-$(i+1)");
-                string brightness = Huely.saved_state.get_string (@"light-brightness-$(i+1)");
-
-                Gdk.RGBA lightColor = Gdk.RGBA ();
-                lightColor.parse (lightColorString);
-
-                debug (@"light: $(i) , $(lightName), $(lightIp), $(lightColor)\n");
-
-                _lightViewModel.Lights.add (
-                    new Huely.Light.with_ip_and_name_and_color_and_brightness (
-                        lightIp,
-                        lightName,
-                        ((uint8)(lightColor.red * 255)),
-                        ((uint8)(lightColor.green * 255)),
-                        ((uint8)(lightColor.blue * 255)),
-                        (uint8)(int.parse(brightness))
-                        )
-                    );
-            }
-*/
 
             default_width = rect.width;
             default_height = rect.height;

@@ -16,14 +16,13 @@ public class Huely.LightViewListBox : Gtk.ListBox
     {
         _viewModel= viewModel;
 
-        set_activate_on_single_click (false);
-
         this.bind_model (this._viewModel.Lights , item =>
         {
             return_val_if_fail (item is Huely.Light, null);
             return new LightListBoxRow.with_light ((Huely.Light) item);
         });
 
+        set_activate_on_single_click (false);
         glp = new Gtk.GestureLongPress (this);
 
         glp.propagation_phase = Gtk.PropagationPhase.TARGET;
