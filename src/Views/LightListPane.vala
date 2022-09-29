@@ -15,7 +15,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
     private Gtk.Revealer _actionBoxRevealer = new Gtk.Revealer ();
     private Gtk.Button _deleteLightButton = new Gtk.Button.from_icon_name ("user-trash-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
 
-    // TODO - implement this.
+    // TODO - implement Grouping.
     //private Gtk.Button _groupLightButton = new Gtk.Button.from_icon_name ("path-combine-symbolic", Gtk.IconSize.LARGE_TOOLBAR) {margin = 3, sensitive = false};
 
     construct
@@ -31,7 +31,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
         _lightViewList = new Huely.LightViewListBox (viewModel);
         _lightViewList.row_selected.connect ((row) =>
         {
-            // FIXME - This is what causes the light row to be selected after
+            // TODO - This is what causes the light row to be selected after
             //         the long press happens. Maybe add a bool here to check
             //         to see what the source of selection is?
 
