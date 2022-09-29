@@ -42,7 +42,7 @@ This project is written in [Vala](https://valadoc.org/) and follows the followin
   - [Developer Guidelines](https://docs.elementary.io/develop/)
   - [Coding style](https://docs.elementary.io/develop/writing-apps/code-style)
 
-Please take some time to familiarise yourself with those documents before continuing.
+Please take some time to familiarize yourself with those documents before continuing.
 
 To get your system ready to develop for elementary OS, please see the [Basic Setup](https://docs.elementary.io/develop/writing-apps/the-basic-setup) section of the [elementary OS Developer Documentation](https://docs.elementary.io/develop/).
 
@@ -111,10 +111,6 @@ Optionally, you can specify a language code (e.g., `tr_TR`) to preview a specifi
 ```shell
 task/preview-in-appcenter <language-code>
 ```
-
-## Continuous integration
-
-[Continuous Integration](https://docs.elementary.io/develop/writing-apps/our-first-app/continuous-integration) is set up for this repository.
 
 ## It’s elementary, my dear…
 
