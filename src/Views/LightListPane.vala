@@ -100,15 +100,28 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             _actionBoxRevealer.set_reveal_child (false);
         });
 
+        _lightViewBox.pack_start (_lightViewList, true, true, 0);
+        _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
+
+        _spinnerBox.valign = Gtk.Align.CENTER;
+        Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
+
+        Gtk.Spinner spinner = new Gtk.Spinner ();
+        spinner.margin = 10;
+        spinner.width_request = 32;
+        spinner.height_request = 32;
+        spinner.start ();
+
+        _spinnerBox.add (spinner);
+        _spinnerBox.add (spinnerLabel);
+
         if (viewModel.Lights.length () == 0)
         {
             DisplayText ();
         }
         else
         {
-            _lightViewBox.pack_start (_lightViewList, true, true, 0);
-            _lightViewBox.pack_end (_actionBoxRevealer, false, false, 0);
-            this.add (_lightViewBox);
+            DisplayLightList ();
         }
     }
 
@@ -139,62 +152,67 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
             this.remove (_spinnerBox);
         }
 
-        _textLabel = new Gtk.Label (displayText) { margin = 10 };
+        if (this.get_children ().index (_textLabel) != -1)
+        {
+            _textLabel.set_visible (true);
+        }
+        else
+        {
+            this.add (_textLabel);
+        }
 
-        this.add (_textLabel);
         this.show_all ();
     }
 
     public void DisplaySearchingForLights ()
     {
-        _spinnerBox.valign = Gtk.Align.CENTER;
-        Gtk.Label spinnerLabel = new Gtk.Label ("Searching for lights...");
-
-        Gtk.Spinner spinner = new Gtk.Spinner ();
-        spinner.margin = 10;
-        spinner.width_request = 32;
-        spinner.height_request = 32;
-
-        _spinnerBox.add (spinner);
-        _spinnerBox.add (spinnerLabel);
-
         if (_textLabel.get_visible ())
         {
-            debug ("Removing onboarding label.\n");
             _textLabel.set_visible (false);
             this.remove (_textLabel);
         }
 
         if (_lightViewBox.get_visible ())
         {
-            debug ("Removing light view box.\n");
             _lightViewBox.set_visible (false);
             this.remove (_lightViewBox);
         }
 
-        this.add (_spinnerBox);
+        if (this.get_children ().index (_spinnerBox) != -1)
+        {
+            _spinnerBox.set_visible (true);
+        }
+        else
+        {
+            this.add (_spinnerBox);
+        }
+
         this.show_all ();
-        spinner.start ();
     }
 
     public void DisplayLightList ()
     {
         if (_textLabel.get_visible ())
         {
-            debug ("Removing onboarding lable.\n");
             _textLabel.set_visible (false);
             this.remove (_textLabel);
         }
 
         if (_spinnerBox.get_visible ())
         {
-            debug ("Removing spinner box.\n");
             _spinnerBox.set_visible (false);
             this.remove (_spinnerBox);
         }
 
-        debug ("Adding light view box.\n");
-        this.add (_lightViewBox);
+        if (this.get_children ().index (_lightViewBox) != -1)
+        {
+            _lightViewBox.set_visible (true);
+        }
+        else
+        {
+            this.add (_lightViewBox);
+        }
+
         this.show_all ();
     }
 

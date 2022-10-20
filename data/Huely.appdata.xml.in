@@ -43,6 +43,15 @@
   </screenshots>
 
   <releases>
+    <release date="2022-10-20" version="0.4.1">
+      <description>
+        <ul>
+          <li>
+            Fixed a minor bug where the 'searching' display would add a new spinner every time the discover button is clicked.
+          </li>
+        </ul>
+      </description>
+    </release>
     <release date="2022-09-29" version="0.4.0">
       <description>
         <ul>
