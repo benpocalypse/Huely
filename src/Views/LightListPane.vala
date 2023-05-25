@@ -1,6 +1,6 @@
 public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 {
-    private Huely.LightViewModel _viewModel
+    private Huely.LightViewModel view_model
     {
         get;
         set;
@@ -27,7 +27,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
 
     public LightListPane (Huely.LightViewModel viewModel)
     {
-        _viewModel = viewModel;
+        view_model = viewModel;
         _lightViewList = new Huely.LightViewListBox (viewModel);
         _lightViewList.row_selected.connect ((row) =>
         {
@@ -93,7 +93,7 @@ public class Huely.LightListPane : Gtk.ScrolledWindow, Huely.IPaneView
                 var lightRow = (LightListBoxRow)row;
                 if (lightRow.IsChecked)
                 {
-                    _viewModel.Lights.remove (lightRow.Light);
+                    view_model.Lights.remove (lightRow.Light);
                 }
             });
 

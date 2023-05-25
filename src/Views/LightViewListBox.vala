@@ -1,6 +1,6 @@
 public class Huely.LightViewListBox : Gtk.ListBox
 {
-    private Huely.LightViewModel _viewModel
+    private Huely.LightViewModel view_model
     {
         get;
         set;
@@ -14,9 +14,9 @@ public class Huely.LightViewListBox : Gtk.ListBox
 
     public LightViewListBox (Huely.LightViewModel viewModel)
     {
-        _viewModel= viewModel;
+        view_model= viewModel;
 
-        this.bind_model (this._viewModel.Lights , item =>
+        this.bind_model (this.view_model.Lights , item =>
         {
             return_val_if_fail (item is Huely.Light, null);
             return new LightListBoxRow.with_light ((Huely.Light) item);
