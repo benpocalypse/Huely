@@ -23,6 +23,11 @@
     <value key="Purism::form_factor">mobile</value>
   </custom>
 
+  <branding>
+  <color type="primary" scheme_preference="light">#273445</color>
+  <color type="primary" scheme_preference="dark">#8394a9</color>
+</branding>
+
   <!-- Links. -->
   <url type="homepage">https://github.com/benpocalypse/Huely</url>
   <url type="bugtracker">https://github.com/benpocalypse/Huely/issues</url>
@@ -43,6 +48,16 @@
   </screenshots>
 
   <releases>
+    <release date="2024-02-26" version="0.4.2">
+      <description>
+        <ul>
+          <li>
+            Fixed a bug where upon starting up, after the user already had lights added, they would appear disconnected and Huely would crash if the user interacted with their saved lights.
+            Added metadata for Flathub to add branding colors.
+          </li>
+        </ul>
+      </description>
+    </release>
     <release date="2022-10-20" version="0.4.1">
       <description>
         <ul>
@@ -91,3 +106,4 @@
   </releases>
 
 </component>
+

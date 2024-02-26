@@ -2,7 +2,7 @@ project(
     'com.github.benpocalypse.Huely',
     'vala',
     'c',
-    version: '0.4.1'
+    version: '0.4.2'
 )
 
 i18n = import('i18n')
@@ -98,3 +98,4 @@ subdir('data')
 
 # Execute post install script to compile gsettings schemas.
 meson.add_install_script('meson/post_install.py')
+

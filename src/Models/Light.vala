@@ -56,6 +56,24 @@ public class Huely.Light : Object
         Green = (uint8)green;
         Blue = (uint8)blue;
         Brightness = (uint8)brightness;
+
+        try
+        {
+            _socket = new GLib.Socket (GLib.SocketFamily.IPV4, GLib.SocketType.STREAM, GLib.SocketProtocol.TCP);
+            _socket.set_timeout (1);
+
+            var loop = new MainLoop();
+            this.ConnectAsync.begin((obj, res) =>
+            {
+                this.ConnectAsync.end (res);
+                loop.quit();
+            });
+            loop.run();
+        }
+        catch (GLib.Error ex)
+        {
+            print (@"Encountered error constrtucting new Light: $(ex.message)\n");
+        }
     }
 
     public string to_string ()
@@ -129,7 +147,7 @@ public class Huely.Light : Object
 */
     }
 
-    // Communications functions
+    // Communication functions
     public async void ConnectAsync ()
     {
         debug ("ConnectAsync ()\n");
@@ -192,7 +210,7 @@ public class Huely.Light : Object
 
         ThreadFunc<bool> run = () =>
         {
-            debug ("GetProtocolAsync ()\n");
+            debug ("GetProtocolAsync ()");
             uint8[] args = {0x81, 0x8a, 0x8b};
             send_data (args);
             try

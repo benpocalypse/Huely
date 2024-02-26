@@ -305,6 +305,7 @@ namespace Huely {
                 Idle.add((owned) callback);
                 return true;
             };
+
             new Thread<bool>("create-layout-thread", (owned)run);
 
             yield;

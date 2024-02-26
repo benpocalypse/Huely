@@ -10,10 +10,6 @@ Control WiFi lights using this simple app.
 <img src="https://www.flathub.org/assets/badges/flathub-badge-en.png" alt="Get it on Flathub" width="165" />
 </a>
 
-## System requirements
-
-  - [elementary OS](https://elementary.io) 6.1 (Jólnir)
-
 ## Hardware requirements
 
 This app is intended to control WiFi connected lights that are compatible with the [Android Magic Home app](https://play.google.com/store/apps/details?id=com.Zengge.LEDWifiMagicHome). Additional light types will most likely be added in the future, but for now this is the initial target light type.
