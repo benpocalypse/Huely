@@ -2,7 +2,7 @@ app-id: com.github.benpocalypse.Huely
 
 sdk: org.gnome.Sdk
 runtime: org.gnome.Platform
-runtime-version: '44'
+runtime-version: '45'
 command: com.github.benpocalypse.Huely
 
 finish-args:
